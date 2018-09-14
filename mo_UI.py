@@ -13,15 +13,20 @@ import mo_Utils.mo_stringUtils as mo_stringUtils
 import mo_Utils.mo_animUtils as mo_animUtils
 import mo_Utils.mo_meshUtils as mo_meshUtils
 import mo_Utils.mo_shaderUtils as mo_shaderUtils
+import mo_Utils.mo_fileSystemUtils as mo_fileSystemUtils
 import mo_Tools.mog_ikFkSwitch as mog_ikFkSwitch
 import mo_Tools.keyRandomizerUI as keyRandomizerUI
 import mo_Tools.mo_storePoseToShelf as mo_storePoseToShelf
 import mo_Tools.straightMotion as straightMotion
 import mo_Tools.mo_imageplaneManager.mo_imageplaneManager as mo_imageplaneManager
-import splitJointUI as splitJointUI
+#import mo_UI.splitJointUI as splitJointUI
 import mo_Tools.mo_lightRigg as mo_lightRigg
 import mo_Utils.libUtil as libUtil
+import mo_Utils.mo_tempExport as tempExport
 reload(mo_shaderUtils)
+reload(mo_animUtils)
+
+tempExportDir = 'D:\\temp'
 
 class mo_UI:
     def __init__(self):
@@ -72,15 +77,15 @@ class mo_UI:
         #1. Get Info
         self.UIElements["mainColumn"] = pm.columnLayout("mainColumn")
 
-
-
-
-
         pm.rowColumnLayout("snapRowColumn", numberOfColumns=3, ro=[(1, "both", 2), (2, "both", 2), (3, "both", 2)], columnAttach=[(1, "both", 3), (2, "both", 3), (3, "both", 3)], columnWidth=[(1,columnWidth), (2,columnWidth),(3,columnWidth)])
-        pm.button(label="snapT", parent="snapRowColumn", command=lambda a:mo_alignUtils.alignPos_constrain())
-        pm.button(label="snapR", parent="snapRowColumn", command=lambda a:mo_alignUtils.alignRot_constrain())
-        pm.button(label="snap", parent="snapRowColumn", command=lambda a:mo_alignUtils.align_constrain())
+        pm.button(label="snapT", parent="snapRowColumn", command=lambda a:mo_riggUtils.snap(pm.selected()[0], pm.selected()[-1], 'point'))
+        pm.button(label="snapR", parent="snapRowColumn", command=lambda a:mo_riggUtils.snap(pm.selected()[0], pm.selected()[-1], 'orient'))
+        pm.button(label="snap", parent="snapRowColumn", command=lambda a:mo_riggUtils.snap(pm.selected()[0], pm.selected()[-1]))
 
+        pm.button(label="tempExport", parent="snapRowColumn", command=lambda a:mo_fileSystemUtils.tempExportSelected(path = tempExportDir))
+        pm.button(label="tempImport", parent="snapRowColumn", command=lambda a:mo_fileSystemUtils.tempImport(path = tempExportDir))
+        pm.button(label="tempExportUI", parent="snapRowColumn", command=lambda a:mo_fileSystemUtils.tempExportSelected(path = tempExportDir))
+        
         pm.setParent(self.UIElements["mainColumn"])
         pm.separator()
         self.UIElements["3"] = pm.rowColumnLayout(numberOfColumns=3, ro=[(1, "both", 2), (2, "both", 2), (3, "both", 2)], columnAttach=[(1, "both", 3), (2, "both", 3), (3, "both", 3)], columnWidth=[(1,columnWidth), (2,columnWidth),(3,columnWidth)])
@@ -102,7 +107,7 @@ class mo_UI:
 
         pm.button(label="createCvControls", command=lambda a:mo_riggUtils.createCvControls(skin=True))
         pm.button(label="alignJ", command=lambda a:mo_riggUtils.alignJ())
-        pm.button(label="vecViz", command=lambda a:mo_riggUtils.vecViz())
+        pm.button(label="vecViz", command=lambda a:mo_riggUtils.vecVizObjects(pm.selected()))
 
         pm.button(label="createIKSpline", command=lambda a:mo_riggUtils.createIKSpline())
         pm.button(label="createJointsAtPos", command=lambda a:mo_riggUtils.createJointsAtPos())
@@ -138,33 +143,35 @@ class mo_UI:
                                                   columnAttach=[(1, "both", 3), (2, "both", 3), (3, "both", 3)],
                                                   columnWidth=[(1, columnWidth), (2, columnWidth), (3, columnWidth)])
         pm.textField("setName", parent="selsetAddRow")
-        pm.popupMenu(parent='setName')
+        pop = pm.popupMenu(parent='setName')
+
+        #pm.optionMenu(label='Colors', changeCommand=lambda a: self.updateTextfield('setName', 'test'))
+
+        quicksets = mo_animUtils.getQuickSelSets()
+        for sceneSet in quicksets:
+            pm.menuItem('%s_menu'%sceneSet, l=sceneSet, command= pm.Callback(self.updateTextfield, 'setName', sceneSet) )
 
 
-        # NEED TO FIX THIS. ERRORS
-        # for sceneSet in mo_animUtils.getQuickSelSets():
-        #     pm.menuItem(sceneSet, command=lambda a: pm.textField("setName", e=1, tx=sceneSet))
-
-        #pm.button(label="add", parent="selsetAddRow", command=lambda a: self.addSelectionSetWin())
-        #pm.button(label="remove", parent="selsetAddRow", command=lambda a: self.removeSelectionSetWin())
-
+        pm.button(label="add", parent="selsetAddRow", command=lambda a: self.addSelectionSetWin())
+        pm.button(label="remove", parent="selsetAddRow", command=lambda a: self.removeSelectionSetWin())
         pm.setParent(self.UIElements["animColumn"])
         pm.separator()
-        # pm.text('selectionSets')
-        # pm.rowLayout("selsetSelRow", numberOfColumns=2, columnWidth2=[300,100], columnAlign=[(1, 'right'),(2, 'left')])
+        pm.text('selectionSets')
+        pm.rowLayout("selsetSelRow", numberOfColumns=2, columnWidth2=[300,100], columnAlign=[(1, 'right'),(2, 'left')])
+        
+        pm.textScrollList("selSetList", parent ="selsetSelRow", width=300, height=50, allowMultiSelection=False,
+                          selectCommand=lambda: self.selectSelectionSetWin())
+        if len(quicksets) > 0:
+            pm.textScrollList("selSetList", e=1, append=quicksets)
+        
+        pm.button(label="delete", parent ="selsetSelRow", height=22,  command=lambda a: self.deleteSelectionSetWin())
+        pm.setParent(self.UIElements["animColumn"])
 
-        # pm.textScrollList("selSetList", parent ="selsetSelRow", width=300, height=50, allowMultiSelection=False,
-        #                   selectCommand=lambda: self.selectSelectionSetWin())
-        #pm.textScrollList("selSetList", e=1, append=mo_animUtils.getQuickSelSets())
+        self.UIElements["1"] = pm.rowColumnLayout(numberOfColumns=3, ro=[(1, "both", 2), (2, "both", 2), (3, "both", 2)], columnAttach=[(1, "both", 3), (2, "both", 3), (3, "both", 3)], columnWidth=[(1,columnWidth), (2,columnWidth),(3,columnWidth)])
 
-        # pm.button(label="delete", parent ="selsetSelRow", height=22,  command=lambda a: self.deleteSelectionSetWin())
-        #pm.setParent(self.UIElements["animColumn"])
-
-        # self.UIElements["1"] = pm.rowColumnLayout(numberOfColumns=3, ro=[(1, "both", 2), (2, "both", 2), (3, "both", 2)], columnAttach=[(1, "both", 3), (2, "both", 3), (3, "both", 3)], columnWidth=[(1,columnWidth), (2,columnWidth),(3,columnWidth)])
-        #
-        # pm.button(label="keyRandomizer", command=lambda a:keyRandomizerUI.createUI())
-        # pm.button(label="setTimesliderToKeyrange", command=lambda a:mo_animUtils.setTimesliderToKeyrange())
-        # pm.button(label="keyEmpty", command=lambda a:mo_animUtils.keyEmpty())
+        pm.button(label="keyRandomizer", command=lambda a:keyRandomizerUI.createUI())
+        pm.button(label="setTimesliderToKeyrange", command=lambda a:mo_animUtils.setTimesliderToKeyrange())
+        pm.button(label="keyEmpty", command=lambda a:mo_animUtils.keyEmpty())
 
          #2. Rigg Editing
         pm.setParent(self.UIElements["animColumn"])
@@ -198,6 +205,8 @@ class mo_UI:
         return self.UIElements["animColumn"]
 
 
+    def updateTextfield(self, name, text):
+        pm.textField(name, e=1, text=text)
 
     def initializeDisplayTab(self, tabHeight, tabWidth):
         columnWidth = 120
@@ -208,6 +217,9 @@ class mo_UI:
         self.UIElements["displayColumn"] = pm.columnLayout(adj=True, rs=3)
         self.UIElements["d1"] = pm.rowColumnLayout(numberOfColumns=3, ro=[(1, "both", 2), (2, "both", 2), (3, "both", 2)], columnAttach=[(1, "both", 3), (2, "both", 3), (3, "both", 3)], columnWidth=[(1,columnWidth), (2,columnWidth),(3,columnWidth)])
 
+        pm.button(label="Layout Outliner", command=lambda a:mo_displayUtil. layoutCleanOutliner(name='cleanPersp/Outliner'))
+        pm.button(label="Layout Anim", command=lambda a: mo_displayUtil.layoutCleanAnim(name='cleanOutliner/Persp/Graph'))
+        pm.button(label="Layout Script", command=lambda a: mo_displayUtil.layoutCleanScripting(name='cleanOutliner/Persp/ScriptEditor'))
 
         pm.button(label="selectHrchy All", command=lambda a:mo_displayUtil.selectHierarchy())
         pm.button(label="selectHrchy Ctl", command=lambda a: mo_displayUtil.selectHierarchy())
