@@ -259,29 +259,40 @@ class mo_UI:
         moduleSpecific_scrollHeight = 120
         scrollHeight = tabHeight - moduleSpecific_scrollHeight - 20
 
-        #1. Anim Editing
+        
         self.UIElements["modelColumn"] = pm.columnLayout(adj=True, rs=3)
         self.UIElements["m1"] = pm.rowColumnLayout(numberOfColumns=3, ro=[(1, "both", 2), (2, "both", 2), (3, "both", 2)], columnAttach=[(1, "both", 3), (2, "both", 3), (3, "both", 3)], columnWidth=[(1,columnWidth), (2,columnWidth),(3,columnWidth)])
 
 
-
+        # Pivots
         pm.button(label="Zero Pivot", command=lambda a: mo_alignUtils.movePivot(pm.selected(), moveto="zero"))
         pm.button(label="Min Y Pivot", command=lambda a: mo_alignUtils.movePivot(pm.selected(), moveto="minY"))
         pm.button(label="Center Pivot", command=lambda a: mo_alignUtils.movePivot(pm.selected(), moveto="center"))
 
+        # Shader assign
         pm.textField("shaderName", width=columnWidth * 0.3)
-        pm.optionMenu(
-            width= columnWidth * 0.3)
+        pm.optionMenu( width= columnWidth * 0.3)
         pm.menuItem(label='Blinn')
         pm.menuItem(label='Lmbert')
         pm.button(label="Assign Shader", command=lambda a: mo_shaderUtils.assignNewMaterial(
             name=pm.textField("shaderName", q=1, text=1), color=[0.5,0.5,0.5], shader="blinn", target=pm.selected()))
 
-        pm.textFieldButtonGrp(label='Label', text='Textkk', buttonLabel='Button')
+        # Tempimport/Export
+        pm.textField("tempExportPath", width=columnWidth * 0.3, text=mo_UI.getHomeDir(subfolder='Documents/maya/tempExport'))
+        pm.button(label="Temp Export", command=lambda a: mo_fileSystemUtils.tempExportSelected(path=pm.textField("tempExportPath", q=1, text=1)))
+        pm.button(label="Temp Import", command=lambda a: mo_fileSystemUtils.tempImport(path=pm.textField("tempExportPath", q=1, text=1)))
+
+        # "C:\Users\dellPC\Documents\maya\tempExport"
 
         pm.setParent(self.UIElements["modelColumn"])
         return self.UIElements["modelColumn"]
 
+    @staticmethod
+    def getHomeDir(subfolder='Documents'):
+        from os.path import expanduser
+        home = expanduser("~")
+        homedirsubfolder = home + '/' +subfolder
+        return homedirsubfolder
 
     def inputSelTfb(self, name):
         if len(pm.selected()) == 0:
