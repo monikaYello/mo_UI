@@ -290,6 +290,10 @@ class mo_UI:
         pm.button(label="random Faces", command=lambda a: mo_meshUtils.selectRandomFaces(pm.selected(), amount=int(pm.textField("amount_input", q=1, text=1))))
 
 
+        pm.button(label="Zero Pivot", command=lambda a: mo_alignUtils.movePivot(pm.selected(), moveto="zero"))
+        pm.button(label="Min Y Pivot", command=lambda a: mo_alignUtils.movePivot(pm.selected(), moveto="minY"))
+        pm.button(label="Center Pivot", command=lambda a: mo_alignUtils.movePivot(pm.selected(), moveto="center"))
+
         # Shader assign
         pm.textField("shaderName", width=columnWidth * 0.3)
         pm.optionMenu( width= columnWidth * 0.3)
