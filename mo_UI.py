@@ -14,7 +14,7 @@ import mo_Utils.mo_animUtils as mo_animUtils
 import mo_Utils.mo_meshUtils as mo_meshUtils
 import mo_Utils.mo_shaderUtils as mo_shaderUtils
 import mo_Utils.mo_fileSystemUtils as mo_fileSystemUtils
-import mo_Tools.mog_ikFkSwitch as mog_ikFkSwitch
+import mo_Tools.mog_ikFkSwitch.mog_ikFkSwitch as mog_ikFkSwitch
 import mo_Tools.keyRandomizerUI as keyRandomizerUI
 import mo_Tools.mo_storePoseToShelf as mo_storePoseToShelf
 import mo_Tools.straightMotion as straightMotion
@@ -24,7 +24,7 @@ import mo_Tools.mo_lightRigg as mo_lightRigg
 import mo_Utils.libUtil as libUtil
 import mo_Utils.mo_tempExport as tempExport
 reload(mo_shaderUtils)
-reload(mo_animUtils)
+reload(mo_displayUtil)
 
 tempExportDir = 'D:\\temp'
 
@@ -147,9 +147,6 @@ class mo_UI:
 
         #pm.optionMenu(label='Colors', changeCommand=lambda a: self.updateTextfield('setName', 'test'))
 
-        quicksets = mo_animUtils.getQuickSelSets()
-        for sceneSet in quicksets:
-            pm.menuItem('%s_menu'%sceneSet, l=sceneSet, command= pm.Callback(self.updateTextfield, 'setName', sceneSet) )
 
 
         pm.button(label="add", parent="selsetAddRow", command=lambda a: self.addSelectionSetWin())
@@ -159,18 +156,18 @@ class mo_UI:
         pm.text('selectionSets')
         pm.rowLayout("selsetSelRow", numberOfColumns=2, columnWidth2=[300,100], columnAlign=[(1, 'right'),(2, 'left')])
         
-        pm.textScrollList("selSetList", parent ="selsetSelRow", width=300, height=50, allowMultiSelection=False,
+        pm.textScrollList("selSetList", parent ="selsetSelRow", width=300, height=100, allowMultiSelection=False,
                           selectCommand=lambda: self.selectSelectionSetWin())
-        if len(quicksets) > 0:
-            pm.textScrollList("selSetList", e=1, append=quicksets)
         
-        pm.button(label="delete", parent ="selsetSelRow", height=22,  command=lambda a: self.deleteSelectionSetWin())
+        pm.columnLayout("selsetModColumn", parent="selsetSelRow")
+        pm.button(label="load", parent ="selsetModColumn", height=22, width=50, command=lambda a: self.loadSelSetWin())
+        pm.button(label="delete", parent ="selsetModColumn", height=22, width=50, command=lambda a: self.deleteSelectionSetWin())
         pm.setParent(self.UIElements["animColumn"])
 
         self.UIElements["1"] = pm.rowColumnLayout(numberOfColumns=3, ro=[(1, "both", 2), (2, "both", 2), (3, "both", 2)], columnAttach=[(1, "both", 3), (2, "both", 3), (3, "both", 3)], columnWidth=[(1,columnWidth), (2,columnWidth),(3,columnWidth)])
 
         pm.button(label="keyRandomizer", command=lambda a:keyRandomizerUI.createUI())
-        pm.button(label="setTimesliderToKeyrange", command=lambda a:mo_animUtils.setTimesliderToKeyrange())
+        pm.button(label="set Timesldr Keyrng", command=lambda a:mo_animUtils.setTimesliderToKeyrange())
         pm.button(label="keyEmpty", command=lambda a:mo_animUtils.keyEmpty())
 
          #2. Rigg Editing
@@ -204,6 +201,12 @@ class mo_UI:
         pm.setParent(self.UIElements["animColumn"])
         return self.UIElements["animColumn"]
 
+    def loadSelSetWin(self):
+        quicksets = mo_animUtils.getQuickSelSets()
+        for sceneSet in quicksets:
+            pm.menuItem('%s_menu'%sceneSet, l=sceneSet, command= pm.Callback(self.updateTextfield, 'setName', sceneSet) )
+        if len(quicksets) > 0:
+            pm.textScrollList("selSetList", e=1, append=quicksets)
 
     def updateTextfield(self, name, text):
         pm.textField(name, e=1, text=text)
@@ -221,23 +224,26 @@ class mo_UI:
         pm.button(label="Layout Anim", command=lambda a: mo_displayUtil.layoutCleanAnim(name='cleanOutliner/Persp/Graph'))
         pm.button(label="Layout Script", command=lambda a: mo_displayUtil.layoutCleanScripting(name='cleanOutliner/Persp/ScriptEditor'))
 
+        pm.button(label="Viz Curves", command=lambda a:mo_displayUtil.toggleCurvesVisibility())
+        pm.button(label="Viz Geo", command=lambda a: mo_displayUtil.toggleGeometryVisibility())
+        pm.button(label="Viz Flat", command=lambda a: mo_displayUtil.toggleFlatShaded())
+
+         #2. Selection
+        pm.setParent(self.UIElements["displayColumn"])
+        pm.separator()
+        self.UIElements["d2"] = pm.rowColumnLayout(numberOfColumns=3, ro=[(1, "both", 2), (2, "both", 2), (3, "both", 2)], columnAttach=[(1, "both", 3), (2, "both", 3), (3, "both", 3)], columnWidth=[(1,columnWidth), (2,columnWidth),(3,columnWidth)])
+
         pm.button(label="selectHrchy All", command=lambda a:mo_displayUtil.selectHierarchy())
         pm.button(label="selectHrchy Ctl", command=lambda a: mo_displayUtil.selectHierarchy())
         pm.button(label="selectHrchy Jnt", command=lambda a: mo_displayUtil.selectHierarchy())
 
-        pm.button(label="getDisplayLayer", command=lambda a:mo_displayUtil.getDisplayLayer())
-        pm.button(label="deleteRefEdits", command=lambda a:mo_displayUtil.deleteRefEdits())
-        pm.button(label="deleteRefEdits", command=lambda a: mo_displayUtil.deleteRefEdits())
+        # pm.button(label="getDisplayLayer", command=lambda a:mo_displayUtil.getDisplayLayer())
+        # pm.button(label="deleteRefEdits", command=lambda a:mo_displayUtil.deleteRefEdits())
+        # pm.button(label="deleteRefEdits", command=lambda a: mo_displayUtil.deleteRefEdits())
 
         pm.button(label="disconnectShaders", command=lambda a:mo_displayUtil.disconnectShaders())
         pm.button(label="viewportSnapshot", command=lambda a:mo_displayUtil.viewportSnapshot())
         pm.button(label="removeNameSpace", command=lambda a:mo_stringUtils.removeNameSpace())
-
-
-         #2. Rigg Editing
-        pm.setParent(self.UIElements["displayColumn"])
-        pm.separator()
-        self.UIElements["d2"] = pm.rowColumnLayout(numberOfColumns=3, ro=[(1, "both", 2), (2, "both", 2), (3, "both", 2)], columnAttach=[(1, "both", 3), (2, "both", 3), (3, "both", 3)], columnWidth=[(1,columnWidth), (2,columnWidth),(3,columnWidth)])
 
         #3. Ctrl Editing
         pm.button(label="list_duplicates", command=lambda a:mo_stringUtils.list_duplicates())
