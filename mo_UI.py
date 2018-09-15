@@ -24,7 +24,7 @@ import mo_Tools.mo_lightRigg as mo_lightRigg
 import mo_Utils.libUtil as libUtil
 import mo_Utils.mo_tempExport as tempExport
 reload(mo_meshUtils)
-reload(mo_displayUtil)
+reload(mo_riggUtils)
 
 tempExportDir = 'G:\\temp'
 
@@ -116,10 +116,15 @@ class mo_UI:
         self.UIElements["5"] = pm.rowColumnLayout(numberOfColumns=3, ro=[(1, "both", 2), (2, "both", 2), (3, "both", 2)], columnAttach=[(1, "both", 3), (2, "both", 3), (3, "both", 3)], columnWidth=[(1,columnWidth), (2,columnWidth),(3,columnWidth)])
 
         #3. Ctrl Editing
-        pm.button(label="cubeCtrl", command=lambda a:mo_riggUtils.createCtrl(shape='cube'))
-        pm.button(label="circleCtrl", command=lambda a: mo_riggUtils.createCtrl(shape='circle'))
-        pm.button(label="locCtrl", command=lambda a:mo_riggUtils.createCtrl(shape='locator'))
+        pm.optionMenu("option_ctrlShape", width= columnWidth * 0.3)
+        pm.menuItem(label='cube')
+        pm.menuItem(label='circle')
+        pm.menuItem(label='locator')
+        self.swatchbtn = pm.button(w=32, h=32, l="", bgc=(1.0, 1.0, 0.0), c=self.set_color)
+        #print('bg color is %s'%self.swatchbtn.getBackgroundColor())
+        pm.button(label="createCtrl", command=lambda a:mo_riggUtils.Ctrl().createOnObj(shape=cmds.optionMenu("option_ctrlShape", query=True, value=True), color=self.swatchbtn.getBackgroundColor()))
 
+        
         pm.button(label="grpZERO", command=lambda a:mo_riggUtils.grpCtrl())
         pm.button(label="Scale +", command=lambda a:mo_riggUtils.scaleShape(1.50))
         pm.button(label="Scale -", command=lambda a:mo_riggUtils.scaleShape(0.75))
@@ -482,6 +487,10 @@ class mo_UI:
 
         mo_ikFkSwitch.ikfkMatch(fkwrist, fkellbow, fkshldr, ikwrist, ikpv, switchCtrl, switchAttr, switch0isfk=switch0isfk,  rotOffset=[rotOffsetX, rotOffsetY, rotOffsetZ])
 
+    def set_color(self, *args):
+        color = pm.colorEditor(rgbValue=(1.0,1.0,0.0))
+        parsedcolor = [float(i) for i in color.split()]
+        self.swatchbtn.setBackgroundColor(parsedcolor[0:-1])
 
 
 
