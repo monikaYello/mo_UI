@@ -23,8 +23,8 @@ import mo_Tools.mo_imageplaneManager.mo_imageplaneManager as mo_imageplaneManage
 import mo_Tools.mo_lightRigg as mo_lightRigg
 import mo_Utils.libUtil as libUtil
 import mo_Utils.mo_tempExport as tempExport
-reload(mo_shaderUtils)
-reload(mo_fileSystemUtils)
+reload(mo_meshUtils)
+reload(mo_alignUtils)
 
 tempExportDir = 'D:\\temp'
 
@@ -271,9 +271,13 @@ class mo_UI:
 
 
         # Pivots
-        pm.button(label="Zero Pivot", command=lambda a: mo_alignUtils.movePivot(pm.selected(), moveto="zero"))
+        pm.button(label="Origin Pivot", command=lambda a: mo_alignUtils.movePivot(pm.selected(), moveto="zero"))
         pm.button(label="Min Y Pivot", command=lambda a: mo_alignUtils.movePivot(pm.selected(), moveto="minY"))
         pm.button(label="Center Pivot", command=lambda a: mo_alignUtils.movePivot(pm.selected(), moveto="center"))
+        # Pivots
+        pm.button(label="Seperate", command=lambda a: mo_meshUtils.separateGeo(objArray = pm.selected(), geoSuffix = 'geo', grpSuffix = 'grp', grp=1, centerPivot=1))
+        pm.button(label="Combine", command=lambda a:mo_meshUtils.combineGeo(pm.selected()))
+        pm.button(label="Move to Orig", command=lambda a: mo_alignUtils.moveToZero(pm.selected()))
 
         # Shader assign
         pm.textField("shaderName", width=columnWidth * 0.3)
