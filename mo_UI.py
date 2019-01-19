@@ -14,7 +14,6 @@ import mo_Utils.mo_animUtils as mo_animUtils
 import mo_Utils.mo_meshUtils as mo_meshUtils
 import mo_Utils.mo_shaderUtils as mo_shaderUtils
 import mo_Utils.mo_fileSystemUtils as mo_fileSystemUtils
-import mo_Tools.mog_ikFkSwitch.mog_ikFkSwitch as mog_ikFkSwitch
 import mo_Tools.keyRandomizerUI as keyRandomizerUI
 import mo_Tools.mo_storePoseToShelf as mo_storePoseToShelf
 import mo_Tools.straightMotion as straightMotion
@@ -124,15 +123,18 @@ class mo_UI:
         #print('bg color is %s'%self.swatchbtn.getBackgroundColor())
         pm.button(label="createCtrl", command=lambda a:mo_riggUtils.Ctrl().createOnObj(shape=cmds.optionMenu("option_ctrlShape", query=True, value=True), color=self.swatchbtn.getBackgroundColor()))
 
-        
-        pm.button(label="grpZERO", command=lambda a:mo_riggUtils.grpCtrl())
-        pm.button(label="Scale +", command=lambda a:mo_riggUtils.scaleShape(1.50))
+        pm.button(label="grpZERO", command=lambda a:self.grpCtrlsWin())
+        pm.button(label="Scale +", command=lambda a:pm.duplicate(po=1))
         pm.button(label="Scale -", command=lambda a:mo_riggUtils.scaleShape(0.75))
 
         pm.setParent(self.UIElements["mainColumn"])
         return self.UIElements["mainColumn"]
 
 
+    def grpCtrlsWin(self):
+        for ctrl in pm.selected():
+            mo_riggUtils.grpCtrl(ctrl)
+    
     def initializeAnimTab(self, tabHeight, tabWidth):
         columnWidth = 120
         moduleSpecific_scrollHeight = 120
@@ -199,10 +201,14 @@ class mo_UI:
         #3. Ctrl Editing
         pm.button(label="straightMotion", command=lambda a:straightMotion.straightMotion())
         pm.button(label="placeHolderLoc", command=lambda a:libUtil.createPlaceHolder(cnx=0))
-        pm.button(label="IkFk Snap UI", command=lambda a:mog_ikFkSwitch.FkIk_UI())
+        pm.button(label="IkFk Snap UI", command=lambda a:self.mog_ikFkSwitchWin())
 
         pm.setParent(self.UIElements["animColumn"])
         return self.UIElements["animColumn"]
+
+    def mog_ikFkSwitchWin(self):
+        import mo_Tools.mog_ikFkSwitch.pro.mog_ikFkSwitch as mog_ikFkSwitch
+        mog_ikFkSwitch.FkIk_UI()
 
     def loadSelSetWin(self):
         quicksets = mo_animUtils.getQuickSelSets()
