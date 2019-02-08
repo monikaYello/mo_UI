@@ -24,9 +24,9 @@ import mo_Tools.mo_lightRigg as mo_lightRigg
 import mo_Utils.libUtil as libUtil
 import mo_Utils.mo_tempExport as tempExport
 reload(mo_meshUtils)
-reload(mo_alignUtils)
+reload(mo_fileSystemUtils)
 
-tempExportDir = 'D:\\temp'
+tempExportDir = 'G:\\temp'
 
 class mo_UI:
     def __init__(self):
@@ -96,6 +96,8 @@ class mo_UI:
 
         pm.button(label="getSkinInfluenceJoints", command=lambda a:mo_riggUtils.getSkinInfluenceJoints())
         pm.button(label="getJointChain", command=lambda a:mo_riggUtils.getJointChain())
+        pm.button(label="delChildConst", command=lambda a: libUtil.deleteChildrenConstraints())
+        
 
         pm.text(label="")
 
@@ -118,12 +120,12 @@ class mo_UI:
         self.UIElements["5"] = pm.rowColumnLayout(numberOfColumns=3, ro=[(1, "both", 2), (2, "both", 2), (3, "both", 2)], columnAttach=[(1, "both", 3), (2, "both", 3), (3, "both", 3)], columnWidth=[(1,columnWidth), (2,columnWidth),(3,columnWidth)])
 
         #3. Ctrl Editing
-        pm.button(label="createCtrl", command=lambda a:mo_riggUtils.createCtrl())
-        pm.button(label="Scale +", command=lambda a:mo_riggUtils.scaleShape(1.50))
-        pm.button(label="Scale -", command=lambda a:mo_riggUtils.scaleShape(0.75))
+        pm.button(label="cubeCtrl", command=lambda a:mo_riggUtils.createCtrl(shape='cube'))
+        pm.button(label="circleCtrl", command=lambda a: mo_riggUtils.createCtrl(shape='circle'))
+        pm.button(label="locCtrl", command=lambda a:mo_riggUtils.createCtrl(shape='locator'))
 
         pm.button(label="grpZERO", command=lambda a:mo_riggUtils.grpCtrl())
-        pm.button(label="Scale +", command=lambda a:pm.duplicate(po=1))
+        pm.button(label="Scale +", command=lambda a:mo_riggUtils.scaleShape(1.50))
         pm.button(label="Scale -", command=lambda a:mo_riggUtils.scaleShape(0.75))
 
         pm.setParent(self.UIElements["mainColumn"])
