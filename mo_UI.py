@@ -276,10 +276,17 @@ class mo_UI:
         pm.button(label="Origin Pivot", command=lambda a: mo_alignUtils.movePivot(pm.selected(), moveto="zero"))
         pm.button(label="Min Y Pivot", command=lambda a: mo_alignUtils.movePivot(pm.selected(), moveto="minY"))
         pm.button(label="Center Pivot", command=lambda a: mo_alignUtils.movePivot(pm.selected(), moveto="center"))
-        # Pivots
+
+        # Mesh Combine
         pm.button(label="Seperate", command=lambda a: mo_meshUtils.separateGeo(objArray = pm.selected(), geoSuffix = 'geo', grpSuffix = 'grp', grp=1, centerPivot=1))
         pm.button(label="Combine", command=lambda a:mo_meshUtils.combineGeo(pm.selected()))
         pm.button(label="Move to Orig", command=lambda a: mo_alignUtils.moveToZero(pm.selected()))
+
+        # Selection
+        pm.button(label="toShell", command=lambda a: mo_meshUtils.toShell())
+        pm.textField("amount_input", width=columnWidth * 0.3)
+        pm.button(label="random Faces", command=lambda a: mo_meshUtils.selectRandomFaces(pm.selected(), amount=int(pm.textField("amount_input", q=1, text=1))))
+
 
         # Shader assign
         pm.textField("shaderName", width=columnWidth * 0.3)
