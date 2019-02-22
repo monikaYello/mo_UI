@@ -24,7 +24,7 @@ import mo_Tools.mo_lightRigg as mo_lightRigg
 import mo_Utils.libUtil as libUtil
 import mo_Utils.mo_tempExport as tempExport
 reload(mo_meshUtils)
-reload(mo_fileSystemUtils)
+reload(mo_displayUtil)
 
 tempExportDir = 'G:\\temp'
 
@@ -80,11 +80,7 @@ class mo_UI:
         pm.rowColumnLayout("snapRowColumn", numberOfColumns=3, ro=[(1, "both", 2), (2, "both", 2), (3, "both", 2)], columnAttach=[(1, "both", 3), (2, "both", 3), (3, "both", 3)], columnWidth=[(1,columnWidth), (2,columnWidth),(3,columnWidth)])
         pm.button(label="snapT", parent="snapRowColumn", command=lambda a:mo_riggUtils.snap(pm.selected()[0], pm.selected()[-1], 'point'))
         pm.button(label="snapR", parent="snapRowColumn", command=lambda a:mo_riggUtils.snap(pm.selected()[0], pm.selected()[-1], 'orient'))
-        pm.button(label="snap", parent="snapRowColumn", command=lambda a:mo_riggUtils.snap(pm.selected()[0], pm.selected()[-1]))
-
-        pm.button(label="tempExport", parent="snapRowColumn", command=lambda a:mo_fileSystemUtils.tempExportSelected(path = tempExportDir))
-        pm.button(label="tempImport", parent="snapRowColumn", command=lambda a:mo_fileSystemUtils.tempImport(path = tempExportDir))
-        pm.button(label="tempExportUI", parent="snapRowColumn", command=lambda a:mo_fileSystemUtils.tempExportSelected(path = tempExportDir))
+        pm.button(label="snap", parent="snapRowColumn", command=lambda a: mo_riggUtils.snap(pm.selected()[0], pm.selected()[-1]))
         
         pm.setParent(self.UIElements["mainColumn"])
         pm.separator()
@@ -250,14 +246,20 @@ class mo_UI:
         #3. Ctrl Editing
         pm.button(label="list_duplicates", command=lambda a:mo_stringUtils.list_duplicates())
         pm.button(label="renameDuplicates", command=lambda a:mo_stringUtils.renameDuplicates())
-        pm.button(label="ipm", command=lambda a:mo_imageplaneManager.ImagePlaneMngWindow.showUI())
-
+        pm.button(label="ipm", command=lambda a: mo_imageplaneManager.ImagePlaneMngWindow.showUI())
+        
         pm.button(label="lightRigg", command=lambda a:mo_lightRigg.createLightRigg(size=10, lightsTop=3, keyTop=[1], fillTop=[2,3],lightsBottom=4))
         pm.text(label="")
         pm.text(label="")
-        #pm.setParent(self.UIElements["displayColumn"])
-        #pm.separator()
-        #self.UIElements["d3"] = pm.rowColumnLayout(numberOfColumns=3, ro=[(1, "both", 2), (2, "both", 2), (3, "both", 2)], columnAttach=[(1, "both", 3), (2, "both", 3), (3, "both", 3)], columnWidth=[(1,columnWidth), (2,columnWidth),(3,columnWidth)])
+
+        pm.setParent(self.UIElements["displayColumn"])
+        pm.separator()
+        self.UIElements["d3"] = pm.rowColumnLayout(numberOfColumns=3, ro=[(1, "both", 2), (2, "both", 2), (3, "both", 2)], columnAttach=[(1, "both", 3), (2, "both", 3), (3, "both", 3)], columnWidth=[(1,columnWidth), (2,columnWidth),(3,columnWidth)])
+
+        pm.button(label="ass Poly", command=lambda a:mo_displayUtil.changeASSmode(obj_list=pm.selected(), mode=2))
+        pm.button(label="ass BB", command=lambda a:mo_displayUtil.changeASSmode(obj_list=pm.selected(), mode=0))
+        pm.button(label="all BB", command=lambda a:mo_displayUtil.changeASSmode(obj_list="all", mode=0))
+        
 
         pm.setParent(self.UIElements["displayColumn"])
         return self.UIElements["displayColumn"]
