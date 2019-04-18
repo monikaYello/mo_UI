@@ -298,6 +298,12 @@ class mo_UI:
         pm.button(label="Assign Shader", command=lambda a: mo_shaderUtils.assignNewMaterial(
             name=pm.textField("shaderName", q=1, text=1), color=[0.5,0.5,0.5], shader="blinn", target=pm.selected()))
 
+        pm.button(label="CopyPaste Mat", command=lambda a: mo_shaderUtils.copyPasteMaterial( objects= pm.selected() ))
+        pm.button(label="CopyPaste Mat", command=lambda a: mo_shaderUtils.copyPasteMaterial(
+            objects=pm.selected()))
+        pm.button(label="CopyPaste Mat", command=lambda a: mo_shaderUtils.copyPasteMaterial(objects=pm.selected()))
+
+
         # Tempimport/Export
         pm.textField("tempExportPath", width=columnWidth * 0.3, text=mo_UI.getHomeDir(subfolder='maya/tempExport'))
         pm.button(label="Temp Export", command=lambda a: mo_fileSystemUtils.tempExportSelected(path=pm.textField("tempExportPath", q=1, text=1)))
