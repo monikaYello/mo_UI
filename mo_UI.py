@@ -14,7 +14,6 @@ import mo_Utils.mo_animUtils as mo_animUtils
 import mo_Utils.mo_meshUtils as mo_meshUtils
 import mo_Utils.mo_shaderUtils as mo_shaderUtils
 import mo_Utils.mo_fileSystemUtils as mo_fileSystemUtils
-import mo_Tools.mog_ikFkSwitch.mog_ikFkSwitch as mog_ikFkSwitch
 import mo_Tools.keyRandomizerUI as keyRandomizerUI
 import mo_Tools.mo_storePoseToShelf as mo_storePoseToShelf
 import mo_Tools.straightMotion as straightMotion
@@ -24,7 +23,7 @@ import mo_Tools.mo_lightRigg as mo_lightRigg
 import mo_Utils.libUtil as libUtil
 import mo_Utils.mo_tempExport as tempExport
 reload(mo_meshUtils)
-reload(mo_displayUtil)
+reload(mo_riggUtils)
 
 tempExportDir = 'G:\\temp'
 
@@ -116,18 +115,26 @@ class mo_UI:
         self.UIElements["5"] = pm.rowColumnLayout(numberOfColumns=3, ro=[(1, "both", 2), (2, "both", 2), (3, "both", 2)], columnAttach=[(1, "both", 3), (2, "both", 3), (3, "both", 3)], columnWidth=[(1,columnWidth), (2,columnWidth),(3,columnWidth)])
 
         #3. Ctrl Editing
-        pm.button(label="cubeCtrl", command=lambda a:mo_riggUtils.createCtrl(shape='cube'))
-        pm.button(label="circleCtrl", command=lambda a: mo_riggUtils.createCtrl(shape='circle'))
-        pm.button(label="locCtrl", command=lambda a:mo_riggUtils.createCtrl(shape='locator'))
+        pm.optionMenu("option_ctrlShape", width= columnWidth * 0.3)
+        pm.menuItem(label='cube')
+        pm.menuItem(label='circle')
+        pm.menuItem(label='locator')
+        self.swatchbtn = pm.button(w=32, h=32, l="", bgc=(1.0, 1.0, 0.0), c=self.set_color)
+        #print('bg color is %s'%self.swatchbtn.getBackgroundColor())
+        pm.button(label="createCtrl", command=lambda a:mo_riggUtils.Ctrl().createOnObj(shape=cmds.optionMenu("option_ctrlShape", query=True, value=True), color=self.swatchbtn.getBackgroundColor()))
 
-        pm.button(label="grpZERO", command=lambda a:mo_riggUtils.grpCtrl())
-        pm.button(label="Scale +", command=lambda a:mo_riggUtils.scaleShape(1.50))
+        pm.button(label="grpZERO", command=lambda a:self.grpCtrlsWin())
+        pm.button(label="Scale +", command=lambda a:pm.duplicate(po=1))
         pm.button(label="Scale -", command=lambda a:mo_riggUtils.scaleShape(0.75))
 
         pm.setParent(self.UIElements["mainColumn"])
         return self.UIElements["mainColumn"]
 
 
+    def grpCtrlsWin(self):
+        for ctrl in pm.selected():
+            mo_riggUtils.grpCtrl(ctrl)
+    
     def initializeAnimTab(self, tabHeight, tabWidth):
         columnWidth = 120
         moduleSpecific_scrollHeight = 120
@@ -194,10 +201,14 @@ class mo_UI:
         #3. Ctrl Editing
         pm.button(label="straightMotion", command=lambda a:straightMotion.straightMotion())
         pm.button(label="placeHolderLoc", command=lambda a:libUtil.createPlaceHolder(cnx=0))
-        pm.button(label="IkFk Snap UI", command=lambda a:mog_ikFkSwitch.FkIk_UI())
+        pm.button(label="IkFk Snap UI", command=lambda a:self.mog_ikFkSwitchWin())
 
         pm.setParent(self.UIElements["animColumn"])
         return self.UIElements["animColumn"]
+
+    def mog_ikFkSwitchWin(self):
+        import mo_Tools.mog_ikFkSwitch.pro.mog_ikFkSwitch as mog_ikFkSwitch
+        mog_ikFkSwitch.FkIk_UI()
 
     def loadSelSetWin(self):
         quicksets = mo_animUtils.getQuickSelSets()
@@ -289,6 +300,10 @@ class mo_UI:
         pm.textField("amount_input", width=columnWidth * 0.3)
         pm.button(label="random Faces", command=lambda a: mo_meshUtils.selectRandomFaces(pm.selected(), amount=int(pm.textField("amount_input", q=1, text=1))))
 
+
+        pm.button(label="Zero Pivot", command=lambda a: mo_alignUtils.movePivot(pm.selected(), moveto="zero"))
+        pm.button(label="Min Y Pivot", command=lambda a: mo_alignUtils.movePivot(pm.selected(), moveto="minY"))
+        pm.button(label="Center Pivot", command=lambda a: mo_alignUtils.movePivot(pm.selected(), moveto="center"))
 
         # Shader assign
         pm.textField("shaderName", width=columnWidth * 0.3)
@@ -484,6 +499,10 @@ class mo_UI:
 
         mo_ikFkSwitch.ikfkMatch(fkwrist, fkellbow, fkshldr, ikwrist, ikpv, switchCtrl, switchAttr, switch0isfk=switch0isfk,  rotOffset=[rotOffsetX, rotOffsetY, rotOffsetZ])
 
+    def set_color(self, *args):
+        color = pm.colorEditor(rgbValue=(1.0,1.0,0.0))
+        parsedcolor = [float(i) for i in color.split()]
+        self.swatchbtn.setBackgroundColor(parsedcolor[0:-1])
 
 
 
