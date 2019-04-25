@@ -124,8 +124,12 @@ class mo_UI:
         pm.button(label="createCtrl", command=lambda a:mo_riggUtils.Ctrl().createOnObj(shape=cmds.optionMenu("option_ctrlShape", query=True, value=True), color=self.swatchbtn.getBackgroundColor()))
 
         pm.button(label="grpZERO", command=lambda a:self.grpCtrlsWin())
-        pm.button(label="Scale +", command=lambda a:pm.duplicate(po=1))
+        pm.button(label="Scale +", command=lambda a:mo_riggUtils.scaleShape(1.25))
         pm.button(label="Scale -", command=lambda a:mo_riggUtils.scaleShape(0.75))
+
+        pm.button(label="connect", command=lambda a:self.connectCtrlWin())
+        pm.button(label="disconnect", command=lambda a:self.disconnectCtrlWin())
+        pm.button(label="connect", command=lambda a:mo_riggUtils.scaleShape(0.75))
 
         pm.setParent(self.UIElements["mainColumn"])
         return self.UIElements["mainColumn"]
@@ -134,6 +138,19 @@ class mo_UI:
     def grpCtrlsWin(self):
         for ctrl in pm.selected():
             mo_riggUtils.grpCtrl(ctrl)
+    
+    def connectCtrlWin(self):
+        for ctrl in pm.selected():
+            ctrlInst = mo_riggUtils.Ctrl()
+            ctrlInst.define(ctrl)
+            print 'Connecting  %s'%ctrlInst
+            ctrlInst.connect()
+    def disconnectCtrlWin(self):
+        for ctrl in pm.selected():
+            ctrlInst = mo_riggUtils.Ctrl()
+            ctrlInst.define(ctrl)
+            print 'Disconnecting %s'%ctrlInst
+            ctrlInst.disconnect()
     
     def initializeAnimTab(self, tabHeight, tabWidth):
         columnWidth = 120
