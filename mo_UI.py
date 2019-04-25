@@ -7,22 +7,22 @@ myScriptPath = 'D:/Google Drive/PythonScripting/scripts'
 if (not myScriptPath in sys.path):
     sys.path.insert(0,myScriptPath)
 import mo_Utils.mo_alignUtils as mo_alignUtils
-import mo_Utils.mo_displayUtils as mo_displayUtil
+#import mo_Utils.mo_displayUtils as mo_displayUtil
 import mo_Utils.mo_riggUtils as mo_riggUtils
 import mo_Utils.mo_stringUtils as mo_stringUtils
 import mo_Utils.mo_animUtils as mo_animUtils
 import mo_Utils.mo_meshUtils as mo_meshUtils
 import mo_Utils.mo_shaderUtils as mo_shaderUtils
 import mo_Utils.mo_fileSystemUtils as mo_fileSystemUtils
+import mo_Utils.mo_renderUtils as mo_renderUtils
 import mo_Tools.keyRandomizerUI as keyRandomizerUI
 import mo_Tools.mo_storePoseToShelf as mo_storePoseToShelf
 import mo_Tools.straightMotion as straightMotion
 import mo_Tools.mo_imageplaneManager.mo_imageplaneManager as mo_imageplaneManager
-#import mo_UI.splitJointUI as splitJointUI
 import mo_Tools.mo_lightRigg as mo_lightRigg
 import mo_Utils.libUtil as libUtil
 import mo_Utils.mo_tempExport as tempExport
-reload(mo_meshUtils)
+reload(mo_renderUtils)
 reload(mo_riggUtils)
 
 tempExportDir = 'G:\\temp'
@@ -38,7 +38,6 @@ class mo_UI:
         self.windowHeight = 598
 
         self.UIElements["window"] = pm.window("mo_UI_window", width=self.windowWidth, height=self.windowHeight, title="mo_UI_window")
-
         self.UIElements["topLevelColumn"] = pm.columnLayout(adjustableColumn=True, columnAlign="center")
 
         #Setup Tabs #every child creates new tab
@@ -55,18 +54,13 @@ class mo_UI:
         displayTab = self.initializeDisplayTab(tabHeight, tabWidth)
         pm.setParent("..")
         modelTab = self.initializeModelTab(tabHeight, tabWidth)
-        pm.tabLayout(self.UIElements["tabs"], edit=True, tabLabel=((riggTab, 'mo_rigg'), (animTab, 'mo_anim'), (displayTab, 'mo_display'), (modelTab, 'mo_model')))
+        pm.setParent("..")
+        renderTab = self.initializeRenderTab(tabHeight, tabWidth)
+
+        pm.tabLayout(self.UIElements["tabs"], edit=True, tabLabel=((riggTab, 'mo_rigg'), (animTab, 'mo_anim'), (displayTab, 'mo_display'), (modelTab, 'mo_model'), (renderTab, 'mo_render')))
 
         #Display window
         pm.showWindow(self.UIElements["window"])
-
-
-
-    '''def createScriptJob(self):
-        self.jobNum = cmds.scriptJob(event=["SelectionChanged", self.modifySelected], runOnce=True, parent=self.UIElements["window"])
-    
-    def deleteScriptJob(self):
-        cmds.scriptJob(kill=self.jobNum)'''
 
     def initializeRiggTab(self, tabHeight, tabWidth):
         columnWidth = 100
@@ -96,7 +90,7 @@ class mo_UI:
 
         pm.text(label="")
 
-         #2. Rigg Editing
+        #2. Rigg Editing
         pm.setParent(self.UIElements["mainColumn"])
         pm.separator()
         self.UIElements["4"] = pm.rowColumnLayout(numberOfColumns=3, ro=[(1, "both", 2), (2, "both", 2), (3, "both", 2)], columnAttach=[(1, "both", 3), (2, "both", 3), (3, "both", 3)], columnWidth=[(1,columnWidth), (2,columnWidth),(3,columnWidth)])
@@ -124,7 +118,7 @@ class mo_UI:
         pm.button(label="createCtrl", command=lambda a:mo_riggUtils.Ctrl().createOnObj(shape=cmds.optionMenu("option_ctrlShape", query=True, value=True), color=self.swatchbtn.getBackgroundColor()))
 
         pm.button(label="grpZERO", command=lambda a:self.grpCtrlsWin())
-        pm.button(label="Scale +", command=lambda a:pm.duplicate(po=1))
+        pm.button(label="Scale +", command=lambda a:mo_riggUtils.scaleShape(1.25))
         pm.button(label="Scale -", command=lambda a:mo_riggUtils.scaleShape(0.75))
 
         pm.setParent(self.UIElements["mainColumn"])
@@ -165,7 +159,7 @@ class mo_UI:
                           selectCommand=lambda: self.selectSelectionSetWin())
         
         pm.columnLayout("selsetModColumn", parent="selsetSelRow")
-        pm.button(label="load", parent ="selsetModColumn", height=22, width=50, command=lambda a: self.loadSelSetWin())
+        pm.button(label="load", parent ="selsetModColumn", height=22, width=50, command=lambda a: self.loadSelectionSetWin())
         pm.button(label="delete", parent ="selsetModColumn", height=22, width=50, command=lambda a: self.deleteSelectionSetWin())
         pm.setParent(self.UIElements["animColumn"])
 
@@ -329,6 +323,32 @@ class mo_UI:
         pm.setParent(self.UIElements["modelColumn"])
         return self.UIElements["modelColumn"]
 
+
+    def initializeRenderTab(self, tabHeight, tabWidth):
+        columnWidth = 120
+        moduleSpecific_scrollHeight = 120
+        scrollHeight = tabHeight - moduleSpecific_scrollHeight - 20
+
+        
+        self.UIElements["renderColumn"] = pm.columnLayout(adj=True, rs=3)
+        self.UIElements["m1"] = pm.rowColumnLayout(numberOfColumns=3, ro=[(1, "both", 2), (2, "both", 2), (3, "both", 2)], columnAttach=[(1, "both", 3), (2, "both", 3), (3, "both", 3)], columnWidth=[(1,columnWidth), (2,columnWidth),(3,columnWidth)])
+
+
+        # Pivots
+        pm.button(label="Prim Vis Off", command=lambda a: mo_renderUtils.ro_primaryVisiblity(enable=0))
+        pm.button(label="Min Y Pivot", command=lambda a: mo_alignUtils.movePivot(pm.selected(), moveto="minY"))
+        pm.button(label="Center Pivot", command=lambda a: mo_alignUtils.movePivot(pm.selected(), moveto="center"))
+
+        # Mesh Combine
+        pm.button(label="Seperate", command=lambda a: mo_meshUtils.separateGeo(objArray = pm.selected(), geoSuffix = 'geo', grpSuffix = 'grp', grp=1, centerPivot=1))
+        pm.button(label="Combine", command=lambda a:mo_meshUtils.combineGeo(pm.selected()))
+        pm.button(label="Move to Orig", command=lambda a: mo_alignUtils.moveToZero(pm.selected()))
+        # "C:\Users\dellPC\Documents\maya\tempExport"
+
+        pm.setParent(self.UIElements["renderColumn"])
+        return self.UIElements["renderColumn"]
+
+        
     @staticmethod
     def getHomeDir(subfolder='Documents'):
         from os.path import expanduser
@@ -356,17 +376,17 @@ class mo_UI:
             return []
         pm.textFieldButtonGrp(name, e=1, tx=attrs[0])
         return attrs
+    def loadSelectionSetWin(self):
+        allsets = pm.ls(et='objectSet')
+        for s in allsets:
+            pm.textScrollList("selSetList", e=1, append=s)
 
     def addSelectionSetWin(self):
         setInput = pm.textField("setName", q=1, tx=1)
         if pm.objExists(setInput) == False:
             pm.sets(n=setInput)
             pm.textScrollList("selSetList", e=1, append=setInput)
-
         pm.sets(setInput, add=pm.selected())
-
-
-
     def removeSelectionSetWin(self):
         setInput = pm.textField("setName", q=1, tx=1)
         if pm.objExists(setInput):
@@ -376,7 +396,6 @@ class mo_UI:
         print 'Selset %s'%selSet
         pm.select(pm.sets(selSet, q=1))
         return 'a'
-
     def deleteSelectionSetWin(self):
         selSet = pm.textScrollList("selSetList", query=1, selectItem=1)
         pm.delete(selSet)
