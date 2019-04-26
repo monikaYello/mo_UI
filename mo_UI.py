@@ -115,19 +115,34 @@ class mo_UI:
         pm.menuItem(label='locator')
         self.swatchbtn = pm.button(w=32, h=32, l="", bgc=(1.0, 1.0, 0.0), c=self.set_color)
         #print('bg color is %s'%self.swatchbtn.getBackgroundColor())
-        pm.button(label="createCtrl", command=lambda a:mo_riggUtils.Ctrl().createOnObj(shape=cmds.optionMenu("option_ctrlShape", query=True, value=True), color=self.swatchbtn.getBackgroundColor()))
+        pm.button(label="createCtrl", command=lambda a: self.createCtrlWin())
+        
 
-        pm.button(label="grpZERO", command=lambda a:self.grpCtrlsWin())
-        pm.button(label="Scale +", command=lambda a:mo_riggUtils.scaleShape(1.25))
-        pm.button(label="Scale -", command=lambda a:mo_riggUtils.scaleShape(0.75))
+        #3. Ctrl Editing
+        pm.optionMenu("option_scaleAxis", width= columnWidth * 0.3)
+        pm.menuItem(label='XYZ')
+        pm.menuItem(label='X')
+        pm.menuItem(label='Y')
+        pm.menuItem(label='Z')
+        pm.menuItem(label='XY')
+        pm.menuItem(label='XZ')
+        pm.menuItem(label='YZ')
+        
+        
+        pm.button(label="Scale +", command=lambda a:mo_riggUtils.scaleShape(1.25, axis=pm.optionMenu("option_scaleAxis", q=1, value=1)))
+        pm.button(label="Scale -", command=lambda a:mo_riggUtils.scaleShape(0.75, axis=pm.optionMenu("option_scaleAxis", q=1, value=1)))
 
         pm.button(label="connect", command=lambda a:self.connectCtrlWin())
         pm.button(label="disconnect", command=lambda a:self.disconnectCtrlWin())
-        pm.button(label="connect", command=lambda a:mo_riggUtils.scaleShape(0.75))
+        pm.button(label="grpZERO", command=lambda a:self.grpCtrlsWin())
 
         pm.setParent(self.UIElements["mainColumn"])
         return self.UIElements["mainColumn"]
 
+    def createCtrlWin(self):
+        for ctrl in pm.selected():
+            pm.select(ctrl)
+            mo_riggUtils.Ctrl().createOnObj(shape=cmds.optionMenu("option_ctrlShape", query=True, value=True), color=self.swatchbtn.getBackgroundColor())
 
     def grpCtrlsWin(self):
         for ctrl in pm.selected():
@@ -351,16 +366,14 @@ class mo_UI:
         self.UIElements["m1"] = pm.rowColumnLayout(numberOfColumns=3, ro=[(1, "both", 2), (2, "both", 2), (3, "both", 2)], columnAttach=[(1, "both", 3), (2, "both", 3), (3, "both", 3)], columnWidth=[(1,columnWidth), (2,columnWidth),(3,columnWidth)])
 
 
-        # Pivots
-        pm.button(label="Prim Vis Off", command=lambda a: mo_renderUtils.ro_primaryVisiblity(enable=0))
-        pm.button(label="Min Y Pivot", command=lambda a: mo_alignUtils.movePivot(pm.selected(), moveto="minY"))
-        pm.button(label="Center Pivot", command=lambda a: mo_alignUtils.movePivot(pm.selected(), moveto="center"))
+        # Renderlayer Overrides
+        pm.button(label="Prim Vis Off", command=lambda a: mo_renderUtils.renderlayerOverride_primaryVisiblity(enable=0))
+        pm.button(label="Receive Shadow Off", command=lambda a: mo_renderUtils.renderlayerOverride_attribute('receiveShadows',enable=0))
+        pm.button(label="Cast Shadow Off", command=lambda a: mo_renderUtils.renderlayerOverride_attribute('castsShadows',enable=0))
 
-        # Mesh Combine
-        pm.button(label="Seperate", command=lambda a: mo_meshUtils.separateGeo(objArray = pm.selected(), geoSuffix = 'geo', grpSuffix = 'grp', grp=1, centerPivot=1))
-        pm.button(label="Combine", command=lambda a:mo_meshUtils.combineGeo(pm.selected()))
-        pm.button(label="Move to Orig", command=lambda a: mo_alignUtils.moveToZero(pm.selected()))
-        # "C:\Users\dellPC\Documents\maya\tempExport"
+        pm.button(label="Prim Vis On", command=lambda a: mo_renderUtils.renderlayerOverride_primaryVisiblity(enable=1))
+        pm.button(label="Receive Shadow On", command=lambda a: mo_renderUtils.renderlayerOverride_attribute('receiveShadows',enable=1))
+        pm.button(label="Cast Shadow On", command=lambda a: mo_renderUtils.renderlayerOverride_attribute('castsShadows',enable=1))
 
         pm.setParent(self.UIElements["renderColumn"])
         return self.UIElements["renderColumn"]
