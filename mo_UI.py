@@ -79,9 +79,9 @@ class mo_UI:
         pm.separator()
         self.UIElements["3"] = pm.rowColumnLayout(numberOfColumns=3, ro=[(1, "both", 2), (2, "both", 2), (3, "both", 2)], columnAttach=[(1, "both", 3), (2, "both", 3), (3, "both", 3)], columnWidth=[(1,columnWidth), (2,columnWidth),(3,columnWidth)])
 
-        pm.button(label="getTransforms", command=lambda a:mo_riggUtils.getTransformations())
-        pm.button(label="getSkinInfluenceJoints", command=lambda a:mo_riggUtils.getSkinInfluenceJoints())
-        pm.button(label="getJointChain", command=lambda a:mo_riggUtils.getJointChain())
+        pm.button(label="hammerSkin", command=lambda a:pm.mel.eval('weightHammerVerts;'))
+        pm.button(label="copySkin", command=lambda a:pm.mel.eval('artAttrSkinWeightCopy;'))
+        pm.button(label="pasteSkin", command=lambda a:pm.mel.eval('artAttrSkinWeightPaste;'))
 
         pm.button(label="getSkinInfluenceJoints", command=lambda a:mo_riggUtils.getSkinInfluenceJoints())
         pm.button(label="getJointChain", command=lambda a:mo_riggUtils.getJointChain())
@@ -367,13 +367,24 @@ class mo_UI:
 
 
         # Renderlayer Overrides
-        pm.button(label="Prim Vis Off", command=lambda a: mo_renderUtils.renderlayerOverride_primaryVisiblity(enable=0))
+        pm.button(label="Prim Vis Off", command=lambda a: mo_renderUtils.renderlayerOverride_attribute('primaryVisibility',enable=0))
         pm.button(label="Receive Shadow Off", command=lambda a: mo_renderUtils.renderlayerOverride_attribute('receiveShadows',enable=0))
         pm.button(label="Cast Shadow Off", command=lambda a: mo_renderUtils.renderlayerOverride_attribute('castsShadows',enable=0))
 
-        pm.button(label="Prim Vis On", command=lambda a: mo_renderUtils.renderlayerOverride_primaryVisiblity(enable=1))
+        pm.button(label="Prim Vis On", command=lambda a: mo_renderUtils.renderlayerOverride_attribute('primaryVisibility',enable=1))
         pm.button(label="Receive Shadow On", command=lambda a: mo_renderUtils.renderlayerOverride_attribute('receiveShadows',enable=1))
         pm.button(label="Cast Shadow On", command=lambda a: mo_renderUtils.renderlayerOverride_attribute('castsShadows',enable=1))
+
+
+        # Renderlayer Overrides
+        pm.button(label="Self Shadow Off", command=lambda a: mo_renderUtils.renderlayerOverride_attribute('aiSelfShadows',enable=0))
+        pm.button(label="Receive Shadow Off", command=lambda a: mo_renderUtils.renderlayerOverride_attribute('receiveShadows',enable=0))
+        pm.button(label="Cast Shadow Off", command=lambda a: mo_renderUtils.renderlayerOverride_attribute('castsShadows',enable=0))
+
+        pm.button(label="Self Shadow On", command=lambda a: mo_renderUtils.renderlayerOverride_attribute('aiSelfShadows',enable=1))
+        pm.button(label="Receive Shadow On", command=lambda a: mo_renderUtils.renderlayerOverride_attribute('receiveShadows',enable=1))
+        pm.button(label="Cast Shadow On", command=lambda a: mo_renderUtils.renderlayerOverride_attribute('castsShadows',enable=1))
+
 
         pm.setParent(self.UIElements["renderColumn"])
         return self.UIElements["renderColumn"]
