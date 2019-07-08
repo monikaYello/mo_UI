@@ -25,7 +25,7 @@ import mo_Utils.mo_tempExport as tempExport
 import mo_Utils.mo_curveLib as mo_curveLib
 import mo_Utils.mo_displayUtils as mo_displayUtil
 reload(mo_renderUtils)
-reload(mo_riggUtils)
+reload(mo_alignUtils)
 
 tempExportDir = 'G:\\temp'
 
@@ -76,7 +76,7 @@ class mo_UI:
         pm.button(label="snapT", parent="snapRowColumn", command=lambda a:mo_riggUtils.snap(pm.selected()[0], pm.selected()[-1], 'point'))
         pm.button(label="snapR", parent="snapRowColumn", command=lambda a:mo_riggUtils.snap(pm.selected()[0], pm.selected()[-1], 'orient'))
         pm.button(label="snap", parent="snapRowColumn", command=lambda a: mo_riggUtils.snap(pm.selected()[0], pm.selected()[-1]))
-        
+
         pm.setParent(self.UIElements["mainColumn"])
         pm.separator()
         self.UIElements["3"] = pm.rowColumnLayout(numberOfColumns=3, ro=[(1, "both", 2), (2, "both", 2), (3, "both", 2)], columnAttach=[(1, "both", 3), (2, "both", 3), (3, "both", 3)], columnWidth=[(1,columnWidth), (2,columnWidth),(3,columnWidth)])
@@ -88,7 +88,7 @@ class mo_UI:
         pm.button(label="getSkinInfluenceJoints", command=lambda a:mo_riggUtils.getSkinInfluenceJoints())
         pm.button(label="getJointChain", command=lambda a:mo_riggUtils.getJointChain())
         pm.button(label="delChildConst", command=lambda a: libUtil.deleteChildrenConstraints())
-        
+
 
         pm.text(label="")
 
@@ -118,7 +118,7 @@ class mo_UI:
         self.swatchbtn = pm.button(w=32, h=32, l="", bgc=(1.0, 1.0, 0.0), c=self.set_color)
         #print('bg color is %s'%self.swatchbtn.getBackgroundColor())
         pm.button(label="createCtrl", command=lambda a: self.createCtrlWin())
-        
+
 
         #3. Ctrl Editing
         pm.optionMenu("option_scaleAxis", width= columnWidth * 0.3)
@@ -129,8 +129,8 @@ class mo_UI:
         pm.menuItem(label='XY')
         pm.menuItem(label='XZ')
         pm.menuItem(label='YZ')
-        
-        
+
+
         pm.button(label="Scale +", command=lambda a:mo_riggUtils.scaleShape(1.25, axis=pm.optionMenu("option_scaleAxis", q=1, value=1)))
         pm.button(label="Scale -", command=lambda a:mo_riggUtils.scaleShape(0.75, axis=pm.optionMenu("option_scaleAxis", q=1, value=1)))
 
@@ -149,7 +149,7 @@ class mo_UI:
     def grpCtrlsWin(self):
         for ctrl in pm.selected():
             mo_riggUtils.grpCtrl(ctrl)
-    
+
     def connectCtrlWin(self):
         for ctrl in pm.selected():
             ctrlInst = mo_riggUtils.Ctrl()
@@ -162,7 +162,7 @@ class mo_UI:
             ctrlInst.define(ctrl)
             print 'Disconnecting %s'%ctrlInst
             ctrlInst.disconnect()
-    
+
     def initializeAnimTab(self, tabHeight, tabWidth):
         columnWidth = 120
         moduleSpecific_scrollHeight = 120
@@ -188,10 +188,10 @@ class mo_UI:
         pm.separator()
         pm.text('selectionSets')
         pm.rowLayout("selsetSelRow", numberOfColumns=2, columnWidth2=[300,100], columnAlign=[(1, 'right'),(2, 'left')])
-        
+
         pm.textScrollList("selSetList", parent ="selsetSelRow", width=300, height=100, allowMultiSelection=False,
                           selectCommand=lambda: self.selectSelectionSetWin())
-        
+
         pm.columnLayout("selsetModColumn", parent="selsetSelRow")
         pm.button(label="load", parent ="selsetModColumn", height=22, width=50, command=lambda a: self.loadSelectionSetWin())
         pm.button(label="delete", parent ="selsetModColumn", height=22, width=50, command=lambda a: self.deleteSelectionSetWin())
@@ -203,7 +203,7 @@ class mo_UI:
         pm.button(label="set Timesldr Keyrng", command=lambda a:mo_animUtils.setTimesliderToKeyrange())
         pm.button(label="keyEmpty", command=lambda a:mo_animUtils.keyEmpty())
 
-         #2. Rigg Editing
+        #2. Rigg Editing
         pm.setParent(self.UIElements["animColumn"])
         pm.separator()
         self.UIElements["2"] = pm.rowColumnLayout(numberOfColumns=3, ro=[(1, "both", 2), (2, "both", 2), (3, "both", 2)], columnAttach=[(1, "both", 3), (2, "both", 3), (3, "both", 3)], columnWidth=[(1,columnWidth), (2,columnWidth),(3,columnWidth)])
@@ -265,7 +265,7 @@ class mo_UI:
         pm.button(label="Viz Geo", command=lambda a: mo_displayUtil.toggleGeometryVisibility())
         pm.button(label="Viz Flat", command=lambda a: mo_displayUtil.toggleFlatShaded())
 
-         #2. Selection
+        #2. Selection
         pm.setParent(self.UIElements["displayColumn"])
         pm.separator()
         self.UIElements["d2"] = pm.rowColumnLayout(numberOfColumns=3, ro=[(1, "both", 2), (2, "both", 2), (3, "both", 2)], columnAttach=[(1, "both", 3), (2, "both", 3), (3, "both", 3)], columnWidth=[(1,columnWidth), (2,columnWidth),(3,columnWidth)])
@@ -286,7 +286,7 @@ class mo_UI:
         pm.button(label="list_duplicates", command=lambda a:mo_stringUtils.list_duplicates())
         pm.button(label="renameDuplicates", command=lambda a:mo_stringUtils.renameDuplicates())
         pm.button(label="ipm", command=lambda a: mo_imageplaneManager.ImagePlaneMngWindow.showUI())
-        
+
         pm.button(label="lightRigg", command=lambda a:mo_lightRigg.createLightRigg(size=10, lightsTop=3, keyTop=[1], fillTop=[2,3],lightsBottom=4))
         pm.text(label="")
         pm.text(label="")
@@ -298,7 +298,7 @@ class mo_UI:
         pm.button(label="ass Poly", command=lambda a:mo_displayUtil.changeASSmode(obj_list=pm.selected(), mode=2))
         pm.button(label="ass BB", command=lambda a:mo_displayUtil.changeASSmode(obj_list=pm.selected(), mode=0))
         pm.button(label="all BB", command=lambda a:mo_displayUtil.changeASSmode(obj_list="all", mode=0))
-        
+
 
         pm.setParent(self.UIElements["displayColumn"])
         return self.UIElements["displayColumn"]
@@ -308,7 +308,7 @@ class mo_UI:
         moduleSpecific_scrollHeight = 120
         scrollHeight = tabHeight - moduleSpecific_scrollHeight - 20
 
-        
+
         self.UIElements["modelColumn"] = pm.columnLayout(adj=True, rs=3)
         self.UIElements["m1"] = pm.rowColumnLayout(numberOfColumns=3, ro=[(1, "both", 2), (2, "both", 2), (3, "both", 2)], columnAttach=[(1, "both", 3), (2, "both", 3), (3, "both", 3)], columnWidth=[(1,columnWidth), (2,columnWidth),(3,columnWidth)])
 
@@ -317,6 +317,10 @@ class mo_UI:
         pm.button(label="Origin Pivot", command=lambda a: mo_alignUtils.movePivot(pm.selected(), moveto="zero"))
         pm.button(label="Min Y Pivot", command=lambda a: mo_alignUtils.movePivot(pm.selected(), moveto="minY"))
         pm.button(label="Center Pivot", command=lambda a: mo_alignUtils.movePivot(pm.selected(), moveto="center"))
+
+        pm.button(label="Copy Pivot", command=lambda a: mo_alignUtils.copyPivot(pm.selected()))
+        pm.button(label="Min Z Pivot", command=lambda a: mo_alignUtils.movePivot(pm.selected(), moveto="minZ"))
+        pm.button(label="Min X Pivot", command=lambda a: mo_alignUtils.movePivot(pm.selected(), moveto="minX"))
 
         # Mesh Combine
         pm.button(label="Seperate", command=lambda a: mo_meshUtils.separateGeo(objArray = pm.selected(), geoSuffix = 'geo', grpSuffix = 'grp', grp=1, centerPivot=1))
@@ -363,7 +367,7 @@ class mo_UI:
         moduleSpecific_scrollHeight = 120
         scrollHeight = tabHeight - moduleSpecific_scrollHeight - 20
 
-        
+
         self.UIElements["renderColumn"] = pm.columnLayout(adj=True, rs=3)
         self.UIElements["m1"] = pm.rowColumnLayout(numberOfColumns=3, ro=[(1, "both", 2), (2, "both", 2), (3, "both", 2)], columnAttach=[(1, "both", 3), (2, "both", 3), (3, "both", 3)], columnWidth=[(1,columnWidth), (2,columnWidth),(3,columnWidth)])
 
@@ -380,18 +384,22 @@ class mo_UI:
 
         # Renderlayer Overrides
         pm.button(label="Self Shadow Off", command=lambda a: mo_renderUtils.renderlayerOverride_attribute('aiSelfShadows',enable=0))
-        pm.button(label="Receive Shadow Off", command=lambda a: mo_renderUtils.renderlayerOverride_attribute('receiveShadows',enable=0))
+        pm.button(label="Shader Override Off",
+                  command=lambda a: mo_renderUtils.
+                  renderlayerOverride_attribute('overrideShaders', enable=0))
         pm.button(label="Cast Shadow Off", command=lambda a: mo_renderUtils.renderlayerOverride_attribute('castsShadows',enable=0))
 
         pm.button(label="Self Shadow On", command=lambda a: mo_renderUtils.renderlayerOverride_attribute('aiSelfShadows',enable=1))
-        pm.button(label="Receive Shadow On", command=lambda a: mo_renderUtils.renderlayerOverride_attribute('receiveShadows',enable=1))
+        pm.button(label="Shader Override On",
+                  command=lambda a: mo_renderUtils.
+                  renderlayerOverride_attribute('overrideShaders', enable=1))
         pm.button(label="Cast Shadow On", command=lambda a: mo_renderUtils.renderlayerOverride_attribute('castsShadows',enable=1))
 
 
         pm.setParent(self.UIElements["renderColumn"])
         return self.UIElements["renderColumn"]
 
-        
+
     @staticmethod
     def getHomeDir(subfolder='Documents'):
         from os.path import expanduser
@@ -407,7 +415,7 @@ class mo_UI:
 
 
     def inputChannelboxSelectionTbf(self, name):
-        channelBox = pm.mel.eval('global string $gChannelBoxName; $temp=$gChannelBoxName;')	#fetch maya's main channelbox
+        channelBox = pm.mel.eval('global string $gChannelBoxName; $temp=$gChannelBoxName;') #fetch maya's main channelbox
         attrs = pm.channelBox(channelBox, q=True, sma=True)
         print 'attributes selected are %s'%attrs
 
