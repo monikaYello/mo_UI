@@ -4,10 +4,16 @@ import maya.cmds as cmds
 import os
 import json
 import pprint
+'''
+import mo_UI.tempExportLibrary.libraryUI as libraryUI
+reload(libraryUI)
+libraryUI.TempExportLibraryUI().show()
+'''
 
-USERAPPDIR = cmds.internalVar(userAppDir=True)
+
+USERAPPDIR = "//192.168.120.60/3d/3D_Library/"
 print USERAPPDIR
-DIRECTORY = os.path.join(USERAPPDIR, 'tempExportLibrary')
+DIRECTORY = os.path.join(USERAPPDIR, 'Temp_Exporter')
 # join will give us correct OS secific slashes
 
 
@@ -15,7 +21,7 @@ def createDirectory(directory=DIRECTORY):
     if not os.path.exists(directory):
         os.mkdir(directory)
 
-class ControllerLibrary(dict):
+class TempExportLibrary(dict):
 
     def save(self, name, directory=DIRECTORY, screenshot=True, **info):
         # info will be dictionary
@@ -77,7 +83,7 @@ class ControllerLibrary(dict):
 
             self[name] = info
 
-        pprint.pprint(self)
+        #pprint.pprint(self)
 
 
     def load(self, name):
@@ -86,20 +92,21 @@ class ControllerLibrary(dict):
 
     def delete(self,name):
 
-        if not os.path.exists(self[name]['path']):
-            print 'file not found'
-        else:
+        try:
             os.remove(self[name]['path'])
+        except:
+            print 'file not found'
 
-        if not os.path.exists(self[name]["screenshot"]) :
-            print 'no screenshot found'
-        else:
+        try:
             os.remove(self[name]["screenshot"])
-
-        if not os.path.exists(self[name]["path"].replace('.ma', '.json')) :
+        except:
             print 'no screenshot found'
-        else:
+            
+        try:
             os.remove(self[name]["path"].replace('.ma', '.json'))
+        except:
+            print 'no json found'
+            
 
     def saveScreenShot(self, name, directory=DIRECTORY):
         path = os.path.join(directory, '%s.jpg'%name)

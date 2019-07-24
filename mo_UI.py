@@ -12,10 +12,10 @@ import mo_Utils.mo_riggUtils as mo_riggUtils
 import mo_Utils.mo_stringUtils as mo_stringUtils
 import mo_Utils.mo_animUtils as mo_animUtils
 import mo_Utils.mo_meshUtils as mo_meshUtils
-import mo_Utils.mo_shaderUtils as mo_shaderUtils
+#import mo_Utils.mo_shaderUtils as mo_shaderUtils
 import mo_Utils.mo_fileSystemUtils as mo_fileSystemUtils
 import mo_Utils.mo_renderUtils as mo_renderUtils
-import mo_Tools.keyRandomizerUI as keyRandomizerUI
+import randomizerUI as randomizerUI
 import mo_Tools.mo_storePoseToShelf as mo_storePoseToShelf
 import mo_Tools.straightMotion as straightMotion
 import mo_Tools.mo_imageplaneManager.mo_imageplaneManager as mo_imageplaneManager
@@ -25,7 +25,7 @@ import mo_Utils.mo_tempExport as tempExport
 import mo_Utils.mo_curveLib as mo_curveLib
 import mo_Utils.mo_displayUtils as mo_displayUtil
 reload(mo_renderUtils)
-reload(mo_alignUtils)
+reload(mo_riggUtils)
 
 tempExportDir = 'G:\\temp'
 
@@ -73,9 +73,9 @@ class mo_UI:
         self.UIElements["mainColumn"] = pm.columnLayout("mainColumn")
 
         pm.rowColumnLayout("snapRowColumn", numberOfColumns=3, ro=[(1, "both", 2), (2, "both", 2), (3, "both", 2)], columnAttach=[(1, "both", 3), (2, "both", 3), (3, "both", 3)], columnWidth=[(1,columnWidth), (2,columnWidth),(3,columnWidth)])
-        pm.button(label="snapT", parent="snapRowColumn", command=lambda a:mo_riggUtils.snap(pm.selected()[0], pm.selected()[-1], 'point'))
-        pm.button(label="snapR", parent="snapRowColumn", command=lambda a:mo_riggUtils.snap(pm.selected()[0], pm.selected()[-1], 'orient'))
-        pm.button(label="snap", parent="snapRowColumn", command=lambda a: mo_riggUtils.snap(pm.selected()[0], pm.selected()[-1]))
+        pm.button(label="snapT", parent="snapRowColumn", bgc=(0.209, 0.209, 0.209), command=lambda a:mo_riggUtils.snap(pm.selected()[0], pm.selected()[-1], 'point'))
+        pm.button(label="snapR", parent="snapRowColumn", bgc=(0.209, 0.209, 0.209), command=lambda a:mo_riggUtils.snap(pm.selected()[0], pm.selected()[-1], 'orient'))
+        pm.button(label="snap", parent="snapRowColumn", bgc=(0.209, 0.209, 0.209), command=lambda a: mo_riggUtils.snap(pm.selected()[0], pm.selected()[-1]))
 
         pm.setParent(self.UIElements["mainColumn"])
         pm.separator()
@@ -103,7 +103,7 @@ class mo_UI:
         pm.button(label="vecViz", command=lambda a:mo_riggUtils.vecVizObjects(pm.selected()))
 
         pm.button(label="createIKSpline", command=lambda a:mo_riggUtils.createIKSpline())
-        pm.button(label="createJointsAtPos", command=lambda a:mo_riggUtils.createJointsAtPos())
+        pm.button(label="createJointsAtPos", command=lambda a:mo_riggUtils.createJointsAtPos(pm.selected()))
         pm.button(label="splitJnt", command=lambda a:splitJointUI.splitSelJointUI())
 
         pm.setParent(self.UIElements["mainColumn"])
@@ -117,7 +117,13 @@ class mo_UI:
         pm.menuItem(label='locator')
         self.swatchbtn = pm.button(w=32, h=32, l="", bgc=(1.0, 1.0, 0.0), c=self.set_color)
         #print('bg color is %s'%self.swatchbtn.getBackgroundColor())
-        pm.button(label="createCtrl", command=lambda a: self.createCtrlWin())
+        pm.button(label="createCtrl", bgc=(0.439, 0.615, 0.184), command=lambda a: self.createCtrlWin(hi=0))
+
+
+        pm.button(label="addGibmal",
+                  command=lambda a: mo_riggUtils.addGimbal(pm.selected()))
+        pm.button(label="addGibmal", command=lambda a: mo_riggUtils.addGimbal(pm.selected()))
+        pm.button(label="createCtrlHi", bgc=(0.439, 0.615, 0.184), command=lambda a: self.createCtrlWin(hi=1, constrain=False))
 
 
         #3. Ctrl Editing
@@ -134,28 +140,59 @@ class mo_UI:
         pm.button(label="Scale +", command=lambda a:mo_riggUtils.scaleShape(1.25, axis=pm.optionMenu("option_scaleAxis", q=1, value=1)))
         pm.button(label="Scale -", command=lambda a:mo_riggUtils.scaleShape(0.75, axis=pm.optionMenu("option_scaleAxis", q=1, value=1)))
 
-        pm.button(label="connect", command=lambda a:self.connectCtrlWin())
-        pm.button(label="disconnect", command=lambda a:self.disconnectCtrlWin())
+        #3. Ctrl Editing
+        pm.optionMenu("option_rotateAxis", width= columnWidth * 0.3)
+        pm.menuItem(label='X')
+        pm.menuItem(label='Y')
+        pm.menuItem(label='Z')
+
+        pm.button(label="Rotate 90", command=lambda a:mo_riggUtils.rotateShape(90, axis=pm.optionMenu("option_rotateAxis", q=1, value=1)))
+        pm.button(label="Rotate 90")
+
+
+        pm.button(label="connect", bgc=(0.439, 0.615, 0.184), command=lambda a:self.connectCtrlWin())
+        pm.button(label="disconnect",bgc=(0.901, 0.411, 0.298), command=lambda a: self.disconnectCtrlWin())
         pm.button(label="grpZERO", command=lambda a:self.grpCtrlsWin())
 
         pm.setParent(self.UIElements["mainColumn"])
         return self.UIElements["mainColumn"]
 
-    def createCtrlWin(self):
-        for ctrl in pm.selected():
-            pm.select(ctrl)
-            mo_riggUtils.Ctrl().createOnObj(shape=cmds.optionMenu("option_ctrlShape", query=True, value=True), color=self.swatchbtn.getBackgroundColor())
+    def createCtrlWin(self, hi=0, parent='', constrain=False):
+
+        objects = pm.selected()
+        print 'creating Ctrl for %s' % objects
+        for object in objects:
+            if object.split('_')[-1] == '_endJnt':
+                print 'Skipping endJnt'
+                continue
+            pm.select(object)
+            ctrl = mo_riggUtils.Ctrl()
+            #print 'ctrl is %s'%ctrl
+            ctrl.createOnObj(shape=cmds.optionMenu("option_ctrlShape", query=True, value=True), constrain=constrain, color=self.swatchbtn.getBackgroundColor())
+            if len(parent) > 0:
+                pm.parent(ctrl.zero, parent)
+            if hi == 1:
+                parent = ctrl.name
+                print 'parent is %s'%parent
+                children = object.listRelatives(children=1)
+                pm.select(children)
+                self.createCtrlWin(hi=1, parent=parent, constrain=constrain)
 
     def grpCtrlsWin(self):
         for ctrl in pm.selected():
             mo_riggUtils.grpCtrl(ctrl)
 
-    def connectCtrlWin(self):
+    def connectCtrlWin(self, objects=[], all=0):
+        if objects == []:
+            objects = pm.selected()
+        if all == 1:
+            objects = pm.ls('*_ctrl', type='transform')
         for ctrl in pm.selected():
             ctrlInst = mo_riggUtils.Ctrl()
             ctrlInst.define(ctrl)
             print 'Connecting  %s'%ctrlInst
             ctrlInst.connect()
+
     def disconnectCtrlWin(self):
         for ctrl in pm.selected():
             ctrlInst = mo_riggUtils.Ctrl()
@@ -199,7 +236,7 @@ class mo_UI:
 
         self.UIElements["1"] = pm.rowColumnLayout(numberOfColumns=3, ro=[(1, "both", 2), (2, "both", 2), (3, "both", 2)], columnAttach=[(1, "both", 3), (2, "both", 3), (3, "both", 3)], columnWidth=[(1,columnWidth), (2,columnWidth),(3,columnWidth)])
 
-        pm.button(label="keyRandomizer", command=lambda a:keyRandomizerUI.createUI())
+        pm.button(label="randomizer", command=lambda a:randomizerUI.randomizer_start())
         pm.button(label="set Timesldr Keyrng", command=lambda a:mo_animUtils.setTimesliderToKeyrange())
         pm.button(label="keyEmpty", command=lambda a:mo_animUtils.keyEmpty())
 
@@ -355,6 +392,7 @@ class mo_UI:
         pm.textField("tempExportPath", width=columnWidth * 0.3, text=mo_UI.getHomeDir(subfolder='maya/tempExport'))
         pm.button(label="Temp Export", command=lambda a: mo_fileSystemUtils.tempExportSelected(path=pm.textField("tempExportPath", q=1, text=1)))
         pm.button(label="Temp Import", command=lambda a: mo_fileSystemUtils.tempImport(path=pm.textField("tempExportPath", q=1, text=1)))
+        
 
         # "C:\Users\dellPC\Documents\maya\tempExport"
 

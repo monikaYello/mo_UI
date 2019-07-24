@@ -1,23 +1,53 @@
 import pprint
-
 from maya import cmds
+import Qt
+import logging
+from maya import OpenMayaUI as omui
+
+logging.basicConfig()
+logger = logging.getLogger('LightingManager')
+logger.setLevel(logging.DEBUG)
+'''
+import mo_UI.tempExportLibrary.libraryUI as libraryUI
+reload(libraryUI)
+libraryUI.TempExportLibraryUI().show()
+'''
+
+from maya import OpenMayaUI as omui
+#from Qt import QtWidgets, QtCore, QtGui
+from PySide2 import QtWidgets, QtCore, QtGui
+
+if Qt.__binding__ == 'PySide':
+    logger.debug('Using Pyside with shiboken')
+    from shiboken import wrapInstance
+    from Qt.QtCore import Signal
+elif Qt.__binding__.startswith('PyQt'):
+    logger.debug('Using PyQt with sip')
+    from sip import wrapinstance as wrapInstance
+    from Qt.QtCore import pyqtSignal as Signal
+else:
+    logger.debug('Using Pyside2 with shiboken')
+    from shiboken2 import wrapInstance
+    from Qt.QtCore import Signal
+
+def getMayaMainWindow():
+    win = omui.MQtUtil_mainWindow()
+    ptr = wrapInstance(long(win), QtWidgets.QMainWindow)
+    return ptr
 
 import tempExportLibrary
 reload(tempExportLibrary)
 
-
-#from Qt import QtWidgets, QtCore, QtGui
-from PySide2 import QtWidgets, QtCore, QtGui
-
-class ControllerLibraryUI(QtWidgets.QDialog):
+class TempExportLibraryUI(QtWidgets.QDialog):
     """
     The TempExportLibraryUI is a dialog that lets us save and import controllers
     """
     def __init__(self):
-        super(ControllerLibraryUI, self).__init__()
+        parent = getMayaMainWindow()
+        super(TempExportLibraryUI, self).__init__(parent=parent)
         self.setWindowTitle("Controller Library UI")
         # The libarry variable points to an instance of our controller library
-        self.library = tempExportLibrary.ControllerLibrary()
+        self.library = tempExportLibrary.TempExportLibrary()
 
         # Every time we creat a new instance, we will automatically build our UI and populate it
         self.buildUI()
@@ -27,6 +57,8 @@ class ControllerLibraryUI(QtWidgets.QDialog):
         """ This method builds our UI """
 
         print "Building UI"
+        ptr = omui.MQtUtil.mainWindow()
+        self.parent_widget = ptr
         layout = QtWidgets.QVBoxLayout(self)
 
         saveWidget = QtWidgets.QWidget()
@@ -83,13 +115,14 @@ class ControllerLibraryUI(QtWidgets.QDialog):
             self.listWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
             self.listWidget.customContextMenuRequested.connect(self.on_context_menu)
             # create context menu
+            
             self.popMenu = QtWidgets.QMenu(self)
             action = QtWidgets.QAction('delete', self)
             self.popMenu.addAction(action)
             # self.popMenu.addAction(QtWidgets.QAction('test1', self))
             # self.popMenu.addSeparator()
             # self.popMenu.addAction(QtWidgets.QAction('test2', self))
-            action.triggered.connect(lambda: self.delete(item.text()))
+            action.triggered.connect(lambda: self.delete(name))
 
             self.listWidget.addItem(item)
             screenshot = info.get('screenshot')
@@ -128,14 +161,9 @@ class ControllerLibraryUI(QtWidgets.QDialog):
         self.popMenu.exec_(self.listWidget.mapToGlobal(point))
 
     def delete(self, item):
-        print item
-        self.library.delete(item)
+        print 'deleting item:%s'%item
+        #self.library.delete(item)
         self.populate()
         self.popMenu.close()
 
 
-def showUI():
-    """ Return UI dialog"""
-    ui = ControllerLibraryUI()
-    ui.show()
-    return ui
