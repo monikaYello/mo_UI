@@ -12,7 +12,7 @@ import mo_Utils.mo_riggUtils as mo_riggUtils
 import mo_Utils.mo_stringUtils as mo_stringUtils
 import mo_Utils.mo_animUtils as mo_animUtils
 import mo_Utils.mo_meshUtils as mo_meshUtils
-#import mo_Utils.mo_shaderUtils as mo_shaderUtils
+import mo_Utils.mo_shaderUtils as mo_shaderUtils
 import mo_Utils.mo_fileSystemUtils as mo_fileSystemUtils
 import mo_Utils.mo_renderUtils as mo_renderUtils
 import randomizerUI as randomizerUI
@@ -24,8 +24,20 @@ import mo_Utils.libUtil as libUtil
 import mo_Utils.mo_tempExport as tempExport
 import mo_Utils.mo_curveLib as mo_curveLib
 import mo_Utils.mo_displayUtils as mo_displayUtil
-reload(mo_renderUtils)
-reload(mo_riggUtils)
+import tempExportLibrary.libraryUI as libraryUI
+reload(mo_shaderUtils)
+reload(randomizerUI)
+
+'''
+import sys
+myScriptPath = 'D:/Google Drive/PythonScripting/scripts'
+myScriptPath = "\\\\192.168.120.60\\\\3d\\Monika\\_resources\\scripts"
+if (not myScriptPath in sys.path):
+    sys.path.insert(0,myScriptPath)
+import mo_UI.mo_UI as ui
+reload(ui)
+ui.mo_UI()
+'''
 
 tempExportDir = 'G:\\temp'
 
@@ -393,7 +405,8 @@ class mo_UI:
         pm.button(label="Temp Export", command=lambda a: mo_fileSystemUtils.tempExportSelected(path=pm.textField("tempExportPath", q=1, text=1)))
         pm.button(label="Temp Import", command=lambda a: mo_fileSystemUtils.tempImport(path=pm.textField("tempExportPath", q=1, text=1)))
         
-
+        pm.button(label="Temp Export UI", command=lambda a: mo_fileSystemUtils.tempImport(path=pm.textField("tempExportPath", q=1, text=1)))
+        
         # "C:\Users\dellPC\Documents\maya\tempExport"
 
         pm.setParent(self.UIElements["modelColumn"])
@@ -419,7 +432,6 @@ class mo_UI:
         pm.button(label="Receive Shadow On", command=lambda a: mo_renderUtils.renderlayerOverride_attribute('receiveShadows',enable=1))
         pm.button(label="Cast Shadow On", command=lambda a: mo_renderUtils.renderlayerOverride_attribute('castsShadows',enable=1))
 
-
         # Renderlayer Overrides
         pm.button(label="Self Shadow Off", command=lambda a: mo_renderUtils.renderlayerOverride_attribute('aiSelfShadows',enable=0))
         pm.button(label="Shader Override Off",
@@ -433,6 +445,10 @@ class mo_UI:
                   renderlayerOverride_attribute('overrideShaders', enable=1))
         pm.button(label="Cast Shadow On", command=lambda a: mo_renderUtils.renderlayerOverride_attribute('castsShadows',enable=1))
 
+        pm.separator()
+        pm.button(label="Rename SEL Shader", bgc=(0.439, 0.615, 0.184), command=lambda a: mo_shaderUtils.renameShadingTrees(pm.selected()))
+        pm.button(label="Rename ALL Shader", bgc=(0.439, 0.615, 0.184), command=lambda a: mo_shaderUtils.renameShadingTrees(all_in_scene=True))
+        pm.button(label="    ", command=lambda a: mo_renderUtils.renderlayerOverride_attribute('castsShadows',enable=1))
 
         pm.setParent(self.UIElements["renderColumn"])
         return self.UIElements["renderColumn"]

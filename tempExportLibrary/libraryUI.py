@@ -113,25 +113,24 @@ class TempExportLibraryUI(QtWidgets.QDialog):
             item = QtWidgets.QListWidgetItem(name)
             #self.listWidget.itemClicked.connect(self.printTest)
             self.listWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-            self.listWidget.customContextMenuRequested.connect(self.on_context_menu)
-            # create context menu
             
-            self.popMenu = QtWidgets.QMenu(self)
-            action = QtWidgets.QAction('delete', self)
-            self.popMenu.addAction(action)
-            # self.popMenu.addAction(QtWidgets.QAction('test1', self))
-            # self.popMenu.addSeparator()
-            # self.popMenu.addAction(QtWidgets.QAction('test2', self))
-            action.triggered.connect(lambda: self.delete(name))
-
+            # create context menu
             self.listWidget.addItem(item)
+            
+            #action = QtWidgets.QAction('openPopMenu', self)
+            #self.listWidget.itemClicked.connect(self.openPopMenu)
+            #action.triggered.connect(lambda: self.openPopMenu(name))
+            
+
+            
             screenshot = info.get('screenshot')
             if screenshot:
                 icon = QtGui.QIcon(screenshot)
                 item.setIcon(icon)
             #self.listWidget.itemClicked(self.mousePressEvent)
             item.setToolTip(pprint.pformat(info))
-
+        self.listWidget.customContextMenuRequested.connect(self.openPopMenu)
+    
     def load(self):
         """ Loads the currently selected controller """
 
@@ -160,10 +159,30 @@ class TempExportLibraryUI(QtWidgets.QDialog):
         # show context menu
         self.popMenu.exec_(self.listWidget.mapToGlobal(point))
 
+    def openPopMenu(self, pos):
+        #
+        
+        item = self.listWidget.currentItem()
+        
+        try:
+            name = item.text()
+            print 'name is %s'%name
+        except:
+            print 'no name'
+            return
+        
+        self.popMenu = QtWidgets.QMenu(self)
+        action = QtWidgets.QAction('delete', self)
+        self.popMenu.addAction(action)
+        tri = action.triggered.connect(lambda: self.delete(name))
+        self.popMenu.exec_(self.listWidget.mapToGlobal(pos))
+
+
     def delete(self, item):
         print 'deleting item:%s'%item
-        #self.library.delete(item)
+        self.library.delete(item)
         self.populate()
         self.popMenu.close()
+        
 
 

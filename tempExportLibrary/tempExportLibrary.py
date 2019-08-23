@@ -1,5 +1,4 @@
 import Qt
-print Qt
 import maya.cmds as cmds
 import os
 import json

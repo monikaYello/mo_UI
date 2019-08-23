@@ -37,55 +37,44 @@ def randomizer_createUserInterface():
 
 	pm.window('randomizer_window', s=0, rtf=0, t="randomizer", wh=(300, 700))
 	# Create UI elements
-	pm.columnLayout('mainColumnLayout', h=930, w=248, columnAlign="center", adjustableColumn=1)
+	pm.columnLayout('mainColumnLayout', h=900, w=248, columnAlign="center", adjustableColumn=1)
 	pm.separator('selectedTransformObjectsSeparator', h=10, w=240, st="none")
-
 	pm.text('selectedTransformObjectsText', fn="boldLabelFont", h=24, l="selected transform Objects", w=240, al="center")
 	pm.textScrollList('selectedTransformObjectsTextScrollList', h=80, w=240)
 	pm.button('loadObjectsButton', h=28, c=lambda *args: randomizer_loadSelection(0), l="load transform Objects", w=240)
 	pm.separator('selectedMaterialsSeparator', h=10, w=240, st="none")
-
 	pm.text('selectedMaterialsText', fn="boldLabelFont", h=24, l="selected Materials", w=240, al="center")
 	pm.textScrollList('selectedMaterialsTextScrollList', h=80, w=240)
 	pm.button('loadMaterialsButton', h=28, c=lambda *args: randomizer_loadSelection(1), l="load Materials", w=240)
 	pm.separator('transformAttributesSeparator', h=10, w=240, st="none")
-
 	pm.text('randomizeAttributesText', fn="boldLabelFont", h=24, l="randomize Attributes", w=240, al="center")
 	pm.checkBoxGrp('randomizeAttributesCheckBoxGrp', h=24, l4="Material", l2="Rotate", l3="Scale", w=240, l1="Translate", ncb=4, cw=[(1, 67), (2, 57), (3, 50), (4, 57)])
 	pm.separator('translateAttributesSeparator', h=10, w=240, st="none")
-
 	pm.text('translateText', fn="boldLabelFont", h=24, l="Translate", w=240, al="center")
 	pm.floatFieldGrp('minMaxXtranslateFloatFieldGrp', pre=3, el="max X", bgc=(0.25, 0, 0), h=24, l="min X", nf=2, v1=0, v2=0, w=240, cw=[(1, 60), (2, 60), (3, 60), (4, 60)])
 	pm.floatFieldGrp('minMaxYtranslateFloatFieldGrp', pre=3, el="max Y", bgc=(0, 0.25, 0), h=24, l="min Y", nf=2, v1=0, v2=0, w=240, cw=[(1, 60), (2, 60), (3, 60), (4, 60)])
 	pm.floatFieldGrp('minMaxZtranslateFloatFieldGrp', pre=3, el="max Z", bgc=(0, 0, 0.25), h=24, l="min Z", nf=2, v1=0, v2=0, w=240, cw=[(1, 60), (2, 60), (3, 60), (4, 60)])
 	pm.separator('rotateAttributesSeparator', h=10, w=240, st="none")
-
 	pm.text('rotateText', fn="boldLabelFont", h=24, l="Rotate", w=240, al="center")
 	pm.floatFieldGrp('minMaxXrotateFloatFieldGrp', pre=3, el="max X", bgc=(0.25, 0, 0), h=24, l="min X", nf=2, v1=0, v2=0, w=240, cw=[(1, 60), (2, 60), (3, 60), (4, 60)])
 	pm.floatFieldGrp('minMaxYrotateFloatFieldGrp', pre=3, el="max Y", bgc=(0, 0.25, 0), h=24, l="min Y", nf=2, v1=0, v2=0, w=240, cw=[(1, 60), (2, 60), (3, 60), (4, 60)])
 	pm.floatFieldGrp('minMaxZrotateFloatFieldGrp', pre=3, el="max Z", bgc=(0, 0, 0.25), h=24, l="min Z", nf=2, v1=0, v2=0, w=240, cw=[(1, 60), (2, 60), (3, 60), (4, 60)])
 	pm.separator('scaleAttributesSeparator', h=10, w=240, st="none")
-
 	pm.text('scaleText', fn="boldLabelFont", h=24, l="Scale", w=240, al="center")
 	pm.floatFieldGrp('minMaxXscaleFloatFieldGrp', pre=3, el="max X", bgc=(0.25, 0, 0), h=24, l="min X", nf=2, v1=1, v2=1, w=240, cw=[(1, 60), (2, 60), (3, 60), (4, 60)])
 	pm.floatFieldGrp('minMaxYscaleFloatFieldGrp', pre=3, el="max Y", bgc=(0, 0.25, 0), h=24, l="min Y", nf=2, v1=1, v2=1, w=240, cw=[(1, 60), (2, 60), (3, 60), (4, 60)])
 	pm.floatFieldGrp('minMaxZscaleFloatFieldGrp', pre=3, el="max Z", bgc=(0, 0, 0.25), h=24, l="min Z", nf=2, v1=1, v2=1, w=240, cw=[(1, 60), (2, 60), (3, 60), (4, 60)])
 	pm.separator('randomizeSelectionSeparator', h=10, w=240, st="none")
-
 	pm.button('randomizeAbsoluteButton', h=28, c=lambda *args: randomizer_randomizeSelection(), l="randomize Abolute", w=240)
 	pm.button('randomizeRelativeButton', h=28, c=lambda *args: randomizer_randomizeSelection(relative=True), l="randomize Relative", w=240)
 	pm.separator('timeAttributesSeparator', h=10, w=240, st="none")
-
 	pm.text('timeText', fn="boldLabelFont", h=24, l="Time", w=240, al="center")
-	pm.checkBoxGrp('randomizeKeyframeCheckBoxGrp', h=24, l2="Rotate", l3="Scale", w=240, l1="Translate", v1=1, v2=1, v3=1, ncb=3, cw=[(1, 67), (2, 57), (3, 50)])
-	pm.intFieldGrp('minMaxTimeIntFieldGrp', el="max", bgc=(0, 0, 0), h=24, l="min", nf=2, v1=0, v2=10, w=240, cw=[(1, 60), (2, 60), (3, 60), (4, 60)])
-	pm.button('setUniformKeyframe', h=28, c=lambda *args: rand_KeyframeUI(objects=None, axis=["X", "Y", "Z"], uniform=True, uniformObject=False, min=-10, max=10, step=1), l="Randomize all Channels together", w=240)
-	pm.button('setRandomKeyframe', h=28, c=lambda *args: rand_KeyframeUI(objects=None, axis=["X", "Y", "Z"], uniform=False, uniformObject=False, min=-10, max=10, step=1), l="Randomize each Channel seperately", w=240)
-	pm.button('setUniformKeyframeAll', h=28, c=lambda *args: rand_KeyframeUI(objects=None, axis=["X", "Y", "Z"], uniform=False, uniformObject=True, min=-10, max=10, step=1), l="Move all Keyframes together", w=240)
+	pm.intFieldGrp('minMaxTimeIntFieldGrp', el="max", bgc=(0, 0, 0), h=24, l="min", nf=2, v1=-1, v2=1, w=240, cw=[(1, 60), (2, 60), (3, 60), (4, 60)])
+	pm.button('setUniformKeyframe', h=28, c=lambda *args: rand_Keyframe(objects=None, attribute="all", axis=["X", "Y", "Z"], uniform=True, min=-10, max=10, step=1), l="Set Keyframes uniform", w=240)
+	pm.button('setRandomKeyframe', h=28, c=lambda *args: rand_Keyframe(objects=None, attribute="all", axis=["X", "Y", "Z"], uniform=False, min=-10, max=10, step=1), l="Set Keyframes random", w=240)
 	pm.separator('undoSeparator', h=10, w=240, st="none")
-
 	pm.button('undoButton', h=28, c=lambda *args: pm.undo(), l="undo", w=240)
-	#pm.iconTextButton('staschiIconTextButton', h=28, c=lambda *args: randomizer_loadHelpWebsite(), l="www.staschi.com", w=240, st="textOnly")
+	pm.iconTextButton('staschiIconTextButton', h=28, c=lambda *args: randomizer_loadHelpWebsite(), l="www.staschi.com", w=240, st="textOnly")
 
 	pm.setParent('..')
 	pm.setParent('..')
@@ -159,9 +148,13 @@ def randomizer_randomizeSelection(relative=False):
 	minZscaleRandomValue=float(pm.floatFieldGrp('minMaxZscaleFloatFieldGrp', q=1, v1=1))
 	maxZscaleRandomValue=float(pm.floatFieldGrp('minMaxZscaleFloatFieldGrp', q=1, v2=1))
 	i=0
-
+	defaultTranslate=pm.getAttr(selectedTransformObjects[i] + ".translate")
+	defaultRotate=pm.getAttr(selectedTransformObjects[i] + ".rotate")
+	defaultScale=pm.getAttr(selectedTransformObjects[i] + ".scale")
+	print 'taking relative rotation %s'%pm.getAttr(selectedTransformObjects[i] + ".rotate")
 
 	if (relative==False):
+		print 'taking absolute'
 		defaultTranslate=[0,0,0]
 		defaultRotate=[0,0,0]
 		defaultScale=[0,0,0]
@@ -173,10 +166,6 @@ def randomizer_randomizeSelection(relative=False):
 	
 	else:
 		for i in range(i,numberOfObjects):
-			defaultTranslate=pm.getAttr(selectedTransformObjects[i] + ".translate")
-			defaultRotate=pm.getAttr(selectedTransformObjects[i] + ".rotate")
-			defaultScale=pm.getAttr(selectedTransformObjects[i] + ".scale")
-
 			if translateCheckbox:
 				randomTranslateX=float(pm.mel.rand(minXtranslateRandomValue, maxXtranslateRandomValue))
 				randomTranslateY=float(pm.mel.rand(minYtranslateRandomValue, maxYtranslateRandomValue))
@@ -222,99 +211,68 @@ def randomizer_randomizeSelection(relative=False):
 	selectedTransformObjects = []
 
 
-def rand_KeyframeUI(objects=None, attrib=[], axis=["X", "Y", "Z"], uniform=False, uniformObject=False, min=1, max=10, step=1):
+def rand_Keyframe(objects=None, attribute="", axis=["X", "Y", "Z"], uniform=False, min=1, max=10, step=1):
 
 	min=int(pm.intFieldGrp('minMaxTimeIntFieldGrp', q=1, v1=1))
 	max=int(pm.intFieldGrp('minMaxTimeIntFieldGrp', q=1, v2=1))
 
-	objects = pm.textScrollList('selectedTransformObjectsTextScrollList', q=1, ai=1)
+	if objects is None:
+		objects = pm.textScrollList('selectedTransformObjectsTextScrollList', q=1, ai=1)
 
-	translateCheckbox = int(pm.checkBoxGrp('randomizeKeyframeCheckBoxGrp', q=1, v1=1))
-	rotateCheckbox = int(pm.checkBoxGrp('randomizeKeyframeCheckBoxGrp', q=1, v2=2))
-	scaleCheckbox = int(pm.checkBoxGrp('randomizeKeyframeCheckBoxGrp', q=1, v3=3))
-
-	if translateCheckbox == 1:
+	if attribute is "translate":
 		#print "Changing Transform Keyframes"
-		attrib.append("translate")
-	if rotateCheckbox == 1:
+		attr = ["translate"]
+	elif attribute is "rotate":
 		#print "Changing Rotate Keyframes"
-		attrib.append("rotate")
-	if scaleCheckbox == 1:
+		attr = ["rotate"]
+	elif attribute is "scale":
 		#print "Changing Scale Keyframes"
-		attrib.append("scale")
+		attr = ["scale"]
+	elif attribute is "all":
+		attr = ["translate", "rotate", "scale"]
+	else:
+		raise ValueError("No attribute given to randomize")
 
-	if attrib == []:
-		pm.error("No Attribute selected")
-
-	rand_Keyframe(objects=objects, attr=attrib, axis=axis, uniform=uniform, uniformObject=uniformObject, min=min, max=max, step=step)
-
-
-def rand_Keyframe(objects=None, attr=["translate", "rotate", "scale"], axis=["X", "Y", "Z"], uniform=False, uniformObject=False, min=1, max=10, step=1):
-
-	# if uniform is false: keyframes are moved completely random for each attr and axis
-	# if uniform is true: keyframes are moved randomly together
-
+	if uniform is True:
+		print "Creating uniform keyframes"
+		axis = [""]
 
 	for object in objects:
 		# loops through the transform objects scroll list
 
-		keys = pm.keyframe(object, at=attr, query=True)
-		keys = list(set(keys))
-		keys.sort()
-		# removes duplicates from the keys list
+		for att in attr:
+			# loops through the attr (attribute)
 
-		randkey = random.randrange(min, max, step)
-		flRandKey = float(randkey)
+			for axi in axis:
+				# loops through the axis (uniform)
 
-		if uniformObject is True:
-			pm.cutKey(object)
-			pm.pasteKey(object, time=(keys[0]+flRandKey))
-			return
+				keys = pm.keyframe(object, at="%s%s" %(att, axi), query=True)
+				newkeys = keys
 
-		newkeys = keys[:]
+				for key in keys:
+					# loops through the already given keyframes from the object
 
-		for key in keys:
-			# loops through the already given keyframes from the object
-			print "i am key: %s" %key
+					try:
+						if uniform is True:
+							# adds "missing" keyframes, so X, Y, Z are uniform
+							pm.cutKey(object, time=(key, key), at="%s%s" %(att, axi))
+							pm.pasteKey(object, time=(key, key), at="%s%s" %(att, axi))
+					except:
+						pass
 
-			if uniform is True:
-				# adds "missing" keyframes, so X, Y, Z are uniform
-				if key in keys:
-					pm.setKeyframe(object, time=(key,key), at=attr)
+					randkey = random.randrange(min, max, step)
+					flRandKey = float(randkey)
 
-				randkey = random.randrange(min, max, step)
-				flRandKey = float(randkey)
-
-				if flRandKey in newkeys:
-					# checks if the keyframe already exists, so the won't get deleted
-					continue
-				else:
-					pm.cutKey(object, time=(key, key), at=attr)
-					pm.pasteKey(object, time=((key+flRandKey), (key+flRandKey)), at=attr)
-					newkeys.append(flRandKey)
-
-
-			else:
-				for att in attr:
-					# loops through the attr (attribute)
-
-					for axi in axis:
-						# loops through the axis (uniform)
-
-						if pm.keyframe(object, time=(key, key), at="%s%s" %(att, axi), query=True):
-							# checks if the attribute has a keyframe
-
-							randkey = random.randrange(min, max, step)
-							flRandKey = float(randkey)
-
-							if flRandKey in newkeys:
-								# checks if the keyframe already exists, so the won't get deleted
-								continue
-							else:
-								pm.cutKey(object, time=(key, key), at="%s%s" %(att, axi))
-								pm.pasteKey(object, time=((key+flRandKey), (key+flRandKey)), at="%s%s" %(att, axi))
-								newkeys.append(flRandKey)
-
+					try:
+						if flRandKey in newkeys:
+							# checks if the keyframe already exists, so the won't get deleted
+							continue
+						else:
+							pm.cutKey(object, time=(key, key), at="%s%s" %(att, axi))
+							pm.pasteKey(object, time=((key+flRandKey), (key+flRandKey)), at="%s%s" %(att, axi))
+							newkeys.append(flRandKey)
+					except:
+						pass
 
 
 
