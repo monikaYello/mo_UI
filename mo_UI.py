@@ -26,7 +26,7 @@ import mo_Utils.mo_curveLib as mo_curveLib
 import mo_Utils.mo_displayUtils as mo_displayUtil
 import tempExportLibrary.libraryUI as libraryUI
 reload(mo_shaderUtils)
-reload(randomizerUI)
+reload(mo_riggUtils)
 
 '''
 import sys
@@ -405,7 +405,7 @@ class mo_UI:
         pm.button(label="Temp Export", command=lambda a: mo_fileSystemUtils.tempExportSelected(path=pm.textField("tempExportPath", q=1, text=1)))
         pm.button(label="Temp Import", command=lambda a: mo_fileSystemUtils.tempImport(path=pm.textField("tempExportPath", q=1, text=1)))
         
-        pm.button(label="Temp Export UI", command=lambda a: mo_fileSystemUtils.tempImport(path=pm.textField("tempExportPath", q=1, text=1)))
+        pm.button(label="Temp Export UI", command=lambda a: libraryUI.TempExportLibraryUI().show())
         
         # "C:\Users\dellPC\Documents\maya\tempExport"
 
