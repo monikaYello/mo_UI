@@ -24,8 +24,7 @@ import mo_Utils.libUtil as libUtil
 import mo_Utils.mo_tempExport as tempExport
 import mo_Utils.mo_curveLib as mo_curveLib
 import mo_Utils.mo_displayUtils as mo_displayUtil
-import tempExportLibrary.libraryUI as libraryUI
-reload(mo_shaderUtils)
+
 reload(mo_riggUtils)
 
 '''
@@ -280,6 +279,8 @@ class mo_UI:
         pm.button(label="placeHolderLoc", command=lambda a:libUtil.createPlaceHolder(cnx=0))
         pm.button(label="IkFk Snap UI", command=lambda a:self.mog_ikFkSwitchWin())
 
+        pm.button(label="findIntersectingUI", command=lambda a:findIntersectingWin())
+
         pm.setParent(self.UIElements["animColumn"])
         return self.UIElements["animColumn"]
 
@@ -405,13 +406,12 @@ class mo_UI:
         pm.button(label="Temp Export", command=lambda a: mo_fileSystemUtils.tempExportSelected(path=pm.textField("tempExportPath", q=1, text=1)))
         pm.button(label="Temp Import", command=lambda a: mo_fileSystemUtils.tempImport(path=pm.textField("tempExportPath", q=1, text=1)))
         
-        pm.button(label="Temp Export UI", command=lambda a: libraryUI.TempExportLibraryUI().show())
+        pm.button(label="Temp Export UI", command=lambda a: tempExportLibraryOpen())
         
         # "C:\Users\dellPC\Documents\maya\tempExport"
 
         pm.setParent(self.UIElements["modelColumn"])
         return self.UIElements["modelColumn"]
-
 
     def initializeRenderTab(self, tabHeight, tabWidth):
         columnWidth = 120
@@ -637,3 +637,13 @@ class mo_UI:
 
 def tempExportSelected(save_name = 'tempExport', path = "U:/personal/Monika/tempExport" ):
     pm.cmds.file("%s/%s.ma"%(path,save_name), pr=1, typ="mayaAscii", force=1, options="v=0;", es=1)
+
+def tempExportLibraryOpen():
+    import tempExportLibrary.libraryUI as libraryUI
+    reload(libraryUI)
+    libraryUI.TempExportLibraryUI().show()
+def findIntersectingWin():
+    import mo_Tools.mo_findIntersectingGeos.mo_findIntersectingGeosPro as mo_fi
+    reload(mo_fi)
+    geos = pm.selected()
+    mo_fi.findIntersecting_UI()
