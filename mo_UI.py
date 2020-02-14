@@ -25,7 +25,7 @@ import mo_Utils.mo_tempExport as tempExport
 import mo_Utils.mo_curveLib as mo_curveLib
 import mo_Utils.mo_displayUtils as mo_displayUtil
 
-reload(mo_riggUtils)
+reload(mo_meshUtils)
 
 '''
 import sys
@@ -376,6 +376,11 @@ class mo_UI:
         pm.button(label="Seperate", command=lambda a: mo_meshUtils.separateGeo(objArray = pm.selected(), geoSuffix = 'geo', grpSuffix = 'grp', grp=1, centerPivot=1))
         pm.button(label="Combine", command=lambda a:mo_meshUtils.combineGeo(pm.selected()))
         pm.button(label="Move to Orig", command=lambda a: mo_alignUtils.moveToZero(pm.selected()))
+        
+        # Mesh Reduce
+        pm.button(label="Reduce 25", command=lambda a: mo_meshUtils.meshReduce(meshes=[], percent=25))
+        pm.button(label="Reduce 50", command=lambda a: mo_meshUtils.meshReduce(meshes=[], percent=50))
+        pm.button(label="Reduce 90", command=lambda a: mo_meshUtils.meshReduce(meshes=[], percent=90))
 
         # Selection
         pm.button(label="toShell", command=lambda a: mo_meshUtils.toShell())
