@@ -25,7 +25,7 @@ import mo_Utils.mo_tempExport as tempExport
 import mo_Utils.mo_curveLib as mo_curveLib
 import mo_Utils.mo_displayUtils as mo_displayUtil
 
-reload(mo_meshUtils)
+reload(mo_riggUtils)
 
 '''
 import sys
@@ -109,7 +109,7 @@ class mo_UI:
         self.UIElements["4"] = pm.rowColumnLayout(numberOfColumns=3, ro=[(1, "both", 2), (2, "both", 2), (3, "both", 2)], columnAttach=[(1, "both", 3), (2, "both", 3), (3, "both", 3)], columnWidth=[(1,columnWidth), (2,columnWidth),(3,columnWidth)])
 
 
-        pm.button(label="createCvControls", command=lambda a:mo_riggUtils.createCvControls(skin=True))
+        pm.button(label="transferSkin", command=lambda a:libUtil.TransferSkinWeightsPolyToPoly(pm.selected()[0], pm.selected()[0:]))
         pm.button(label="alignJ", command=lambda a:mo_riggUtils.alignJ())
         pm.button(label="vecViz", command=lambda a:mo_riggUtils.vecVizObjects(pm.selected()))
 
